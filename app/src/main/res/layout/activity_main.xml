@@ -11,7 +11,7 @@
         android:layout_width="174dp"
         android:layout_height="51dp"
         android:layout_marginTop="68dp"
-        android:text="WAMobile"
+        android:text="@string/app_name"
         android:textAlignment="center"
         android:textSize="36sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -24,7 +24,7 @@
         android:layout_width="361dp"
         android:layout_height="38dp"
         android:layout_marginTop="48dp"
-        android:text="Welcome. To start, please log in with your University of Guelph Central Login ID."
+        android:text="@string/welcome_text"
         android:textAlignment="center"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
@@ -37,12 +37,14 @@
         android:layout_height="44dp"
         android:layout_marginTop="136dp"
         android:ems="10"
-        android:hint="Username"
+        android:hint="@string/username_hint"
         android:inputType="textPersonName"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/textView_subtitle" />
+        app:layout_constraintTop_toBottomOf="@+id/textView_subtitle"
+        android:autofillHints="username"
+        android:importantForAutofill="yes" />
 
     <EditText
         android:id="@+id/editText_password"
@@ -50,21 +52,37 @@
         android:layout_height="44dp"
         android:layout_marginTop="16dp"
         android:ems="10"
-        android:hint="Password"
+        android:hint="@string/password_hint"
         android:inputType="textPassword"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.492"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/editText_username" />
+        app:layout_constraintTop_toBottomOf="@+id/editText_username"
+        android:autofillHints="password"
+        android:importantForAutofill="yes" />
 
     <Button
         android:id="@+id/button_login"
         android:layout_width="342dp"
         android:layout_height="56dp"
         android:layout_marginTop="60dp"
-        android:text="Login"
+        android:text="@string/login_button_text"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.498"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/editText_password" />
+
+    <TextView
+        android:id="@+id/textView_badLogin"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/bad_login"
+        android:textColor="#FF0000"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toTopOf="@+id/editText_username"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.498"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/textView_subtitle"
+        app:layout_constraintVertical_bias="0.735" />
 </androidx.constraintlayout.widget.ConstraintLayout>
