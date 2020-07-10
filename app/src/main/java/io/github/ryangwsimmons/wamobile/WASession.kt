@@ -1,6 +1,5 @@
 package io.github.ryangwsimmons.wamobile
 
-import android.os.AsyncTask
 import org.jsoup.Connection.Method
 import org.jsoup.Connection.Response
 import org.jsoup.Jsoup
@@ -16,19 +15,15 @@ class WASession(private val username: String, private val password: String): Ser
     lateinit var homeCookies: Map<String, String>
 
     public suspend fun initConnection(): String {
-        suspend fun makeInitialConnection(): Map<String, String> {
+        try {
             //Make the initial connection to the WebAdvisor main page
             var res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TYPE=M&PID=CORE-WBMAIN&TOKENIDX=").followRedirects(true).execute()
 
             //Collect the cookies from the previous connection
-            var cookies: Map<String, String> = res.cookies()
+            var cookies: MutableMap<String, String> = res.cookies()
 
-            return cookies
-        }
-
-        suspend fun makeLoginConnection(cookies: Map<String, String>): Response {
             //Make the login request to the server
-            val res = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX="
+            res = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX="
                     + cookies.get("LASTTOKEN")
                     + "&SS=LGRQ&URL=https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TYPE=M%26PID=CORE-WBMAIN%26TOKENIDX="
                     + cookies.get("LASTTOKEN")
@@ -39,12 +34,8 @@ class WASession(private val username: String, private val password: String): Ser
                 .followRedirects(true)
                 .execute()
 
-            return res
-        }
-
-        try {
-            var cookies = makeInitialConnection()
-            val res = makeLoginConnection(cookies)
+            //Update the cookies from the initial connection with the cookies from the login request
+            cookies.putAll(res.cookies())
 
             //Parse the resulting document
             var doc: Document = res.parse()
