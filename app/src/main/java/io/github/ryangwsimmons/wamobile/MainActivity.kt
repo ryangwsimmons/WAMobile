@@ -4,7 +4,9 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
+import android.widget.Toast
 import kotlinx.android.synthetic.main.activity_main.*
+import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
@@ -18,8 +20,6 @@ class MainActivity : AppCompatActivity() {
 
         //Set the action for when the "Login" button is tapped
         button_login.setOnClickListener(fun (v: View) {
-            //Make the bad login text invisible
-            textView_badLogin.visibility = View.INVISIBLE
 
             //Get the username and password the user entered
             var username: String = editText_username.text.toString()
@@ -27,36 +27,38 @@ class MainActivity : AppCompatActivity() {
 
             //Make sure that a username and password have been entered
             if (username == "" || password == "") {
-                textView_badLogin.text = "Please enter a valid username and password."
-                textView_badLogin.visibility = View.VISIBLE
-
+                Toast.makeText(applicationContext, "Please enter a valid username and password.", Toast.LENGTH_SHORT).show()
                 return
             }
 
             //Create a new WebAdvisor session
             val session: WASession = WASession(username, password)
 
-            try {
-                CoroutineScope(IO).launch {
-                    //Initiate the connection to WebAdvisor
-                    if (session.initConnection() != "success") {
-                        throw Exception("A network error has occurred. Please check your internet connection and try again.")
-                    }
-
-                    //Change the activity
-                    withContext(Main) {
-                        //Create an intent to change activity
-                        val intent = Intent(this@MainActivity, UserMenuActivity::class.java).apply {
-                            putExtra("session", session)
-                        }
-
-                        //Start the activity
-                        startActivity(intent)
+            //Handle any errors that occur in the coroutine
+            val errorHandler = CoroutineExceptionHandler { _, error ->
+                CoroutineScope(Main).launch {
+                    Toast.makeText(applicationContext, error.message ?: "A network error has occurred. Please check your internet connection and try again.", Toast.LENGTH_LONG).show()
+                    if (error.message != null) {
+                        Toast.makeText(applicationContext, "An error has occurred. Please check your internet connection try again.", Toast.LENGTH_LONG).show()
                     }
                 }
-            } catch (e: Exception) {
-                textView_badLogin.text = e.message
-                textView_badLogin.visibility = View.VISIBLE
+            }
+
+            CoroutineScope(errorHandler).launch {
+                //Initiate the connection to WebAdvisor
+                session.initConnection()
+
+                //Change the activity
+                withContext(Main) {
+                    //Create an intent to change activity
+                    val intent = Intent(this@MainActivity, BaseActivity::class.java).apply {
+                        putExtra("session", session)
+                    }
+                    intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
+
+                    //Start the activity
+                    startActivity(intent)
+                }
             }
         })
     }
