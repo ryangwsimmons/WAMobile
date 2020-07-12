@@ -72,4 +72,36 @@ class WASession(private val username: String, private val password: String): Ser
         //Return the name
         return name
     }
+
+    @Throws(Exception::class)
+    public suspend fun getTerms(): ArrayList<Term> {
+        //Create a new ArrayList to hold all the terms obtained from the reequest
+        var terms: ArrayList<Term> = ArrayList<Term>()
+
+        //Connect to the WebAdvisor grades page for the signed-in user
+        var res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX="
+                + this.homeCookies.get("LASTTOKEN") + "&CONSTITUENCY=WBST&type=P&pid=ST-WESTS02A")
+            .cookies(this.homeCookies)
+            .followRedirects(true)
+            .execute()
+
+        //Parse the response document's HTML
+        var doc: Document = res.parse()
+
+        //Add all the terms to the ArrayList
+        for(row: Element in doc.getElementById("GROUP_Grp_LIST_VAR1").getElementsByTag("tr")) {
+            //If the current row in the table contains body cells (as opposed to header cells), add a new Term to the ArrayList
+            if (row.getElementsByTag("td").size != 0) {
+                var shortName: String = row.getElementsByClass("LIST_VAR2").get(0).getElementsByTag("p").get(0).text()
+                var longName: String = row.getElementsByClass("LIST_VAR3").get(0).getElementsByTag("p").get(0).text()
+                var startDate: String = row.getElementsByClass("DATE_LIST_VAR1").get(0).getElementsByTag("p").get(0).text()
+                var endDate: String = row.getElementsByClass("DATE_LIST_VAR2").get(0).getElementsByTag("p").get(0).text()
+
+                terms.add(Term(shortName, longName, startDate, endDate))
+            }
+        }
+
+        //Return the ArrayList of Terms
+        return terms
+    }
 }
