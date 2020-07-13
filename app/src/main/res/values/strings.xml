@@ -1,7 +1,13 @@
 <resources>
     <string name="app_name">WAMobile</string>
-    <string name="welcome_text">Welcome. To start, please log in with your University of Guelph Central Login ID.</string>
+    <string name="welcome_text">Welcome.\nTo start, please log in with your University of Guelph Central Login ID.</string>
     <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
     <string name="login_button_text">Login</string>
+    <string name="title_activity_grade_view">GradeViewActivity</string>
+    <!--
+    This string is used for square devices and overridden by hello_world in
+    values-round/strings.xml for round devices.
+    -->
+    <string name="hello_world">Hello Square World!</string>
 </resources>

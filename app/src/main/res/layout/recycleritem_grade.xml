@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_grades_courseSection"
+            android:textSize="16sp"
+            android:paddingBottom="2dp"
+            android:text="CIS*1000*0101" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_grades_courseTitle"
+            android:textSize="20sp"
+            android:textStyle="bold"
+            android:paddingBottom="2dp"
+            android:layout_below="@id/textView_grades_courseSection"
+            android:text="Introduction to Test Course 1" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_grades_finalGrade"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:layout_below="@id/textView_grades_courseTitle"
+            android:text="Final Grade: 100%" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_grades_Credits"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@id/textView_grades_finalGrade"
+            android:text="Credits: 0.75" />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

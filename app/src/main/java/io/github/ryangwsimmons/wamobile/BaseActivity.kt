@@ -37,7 +37,8 @@ class BaseActivity : AppCompatActivity() {
         setContentView(R.layout.activity_base)
 
         //Get the session object
-        this.session = getIntent().getSerializableExtra("session") as WASession
+        val bundle: Bundle = intent.getBundleExtra("bundle")!!
+        this.session = bundle.getParcelable<WASession>("session")!!
 
         //Define the toolbar for the activity
         this.toolbar = toolBar

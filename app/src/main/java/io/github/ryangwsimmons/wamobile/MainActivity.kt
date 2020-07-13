@@ -32,7 +32,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             //Create a new WebAdvisor session
-            val session: WASession = WASession(username, password)
+            val session: WASession = WASession(username, password, HashMap<String, String>())
 
             //Handle any errors that occur in the coroutine
             val errorHandler = CoroutineExceptionHandler { _, error ->
@@ -52,7 +52,10 @@ class MainActivity : AppCompatActivity() {
                 withContext(Main) {
                     //Create an intent to change activity
                     val intent = Intent(this@MainActivity, BaseActivity::class.java).apply {
-                        putExtra("session", session)
+                        //Set up the parcel for passing data to the activity
+                        var bundle: Bundle = Bundle()
+                        bundle.putParcelable("session", session)
+                        putExtra("bundle", bundle)
                     }
                     intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK or Intent.FLAG_ACTIVITY_CLEAR_TASK
 

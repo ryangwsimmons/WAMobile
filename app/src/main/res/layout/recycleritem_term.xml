@@ -1,0 +1,51 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_term_longName"
+            android:textSize="18sp"
+            android:textStyle="bold"
+            android:text="Long Name" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_term_shortName"
+            android:layout_below="@id/textView_term_longName"
+            android:textSize="12sp"
+            android:textStyle="italic"
+            android:text="Short Name"/>
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_term_startDate"
+            android:textSize="13sp"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@id/textView_term_longName"
+            android:text="Start Date: 01/01/1970" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_term_endDate"
+            android:textSize="13sp"
+            android:layout_below="@id/textView_term_startDate"
+            android:layout_alignParentRight="true"
+            android:layout_alignBaseline="@id/textView_term_shortName"
+            android:text="End Date: 01/01/1970" />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>
