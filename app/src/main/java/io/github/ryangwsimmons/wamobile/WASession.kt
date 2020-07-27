@@ -200,4 +200,42 @@ class WASession(private val username: String, private val password: String, priv
             }
         }
     }
+
+    @Throws(Exception::class)
+    public suspend fun getNewsItems(): List<NewsItem> {
+        //Check that a connection has been initialized
+        if (this.homeCookies.size == 0) {
+            throw Exception("Error: The connection has not yet been initialized.")
+        }
+
+        //Create an ArrayList to store the news items
+        var newsItems = ArrayList<NewsItem>()
+
+        //Make a connection to the WebAdvisor main page for students (the one with the news)
+        val res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + this.homeCookies.get("LASTTOKEN") + "&type=M&constituency=WBST&pid=CORE-WBST")
+            .cookies(this.homeCookies)
+            .followRedirects(true)
+            .execute()
+
+        //Parse the resulting document's HTML
+        var doc: Document = res.parse()
+
+        //Loop through all the news items on the page, adding each item to the ArrayList of news items
+        for (i in 0..(doc.getElementById("content").getElementsByClass("customText").last().getElementsByTag("h1").size - 1)) {
+            //Get the main heading of a particular news item
+            val heading1: String = doc.getElementById("content").getElementsByClass("customText").last().getElementsByTag("h1")[i].text()
+
+            //Get the subheading of a particular news item
+            val heading2: String = doc.getElementById("content").getElementsByClass("customText").last().getElementsByTag("h2")[i].text()
+
+            //Get the body of a particular news item
+            val body: String = doc.getElementById("content").getElementsByClass("customText").last().getElementsByTag("p")[i].html()
+
+            //Create a new NewsItem object, and add it to the ArrayList
+            newsItems.add(NewsItem(heading1, heading2, body))
+        }
+
+        //Return the resulting list of news items
+        return newsItems
+    }
 }

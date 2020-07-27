@@ -1,0 +1,239 @@
+<?xml version="1.0" encoding="utf-8"?>
+<ScrollView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    tools:context=".SearchSectionsFragment">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_term"
+                android:textSize="20sp"
+                android:text="@string/search_sections_term" />
+
+            <Spinner
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/spinner_terms"
+                android:layout_toEndOf="@id/textView_term"
+                android:layout_alignTop="@id/textView_term"
+                android:layout_alignBottom="@id/textView_term"
+                android:layout_marginStart="8dp" />
+        </RelativeLayout>
+
+        <include
+            layout="@layout/search_sections_filter_group"
+            android:id="@+id/searchSections_filterGroup1"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="20dp" />
+
+        <include
+            layout="@layout/search_sections_filter_group"
+            android:id="@+id/searchSections_filterGroup2"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="20dp" />
+
+        <include
+            layout="@layout/search_sections_filter_group"
+            android:id="@+id/searchSections_filterGroup3"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="20dp" />
+
+        <include
+            layout="@layout/search_sections_filter_group"
+            android:id="@+id/searchSections_filterGroup4"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="20dp" />
+
+        <include
+            layout="@layout/search_sections_filter_group"
+            android:id="@+id/searchSections_filterGroup5"
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="50dp"
+            android:layout_marginEnd="50dp"
+            android:layout_marginTop="20dp" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_meetingAfter"
+                android:textSize="18sp"
+                android:text="@string/search_sections_meetingAfter" />
+
+            <Spinner
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/spinner_meetingAfter"
+                android:layout_toEndOf="@id/textView_meetingAfter"
+                android:layout_alignTop="@id/textView_meetingAfter"
+                android:layout_alignBottom="@id/textView_meetingAfter"
+                android:layout_marginStart="8dp" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_endingBefore"
+                android:textSize="18sp"
+                android:text="@string/search_sections_endingBefore" />
+
+            <Spinner
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/spinner_endingBefore"
+                android:layout_toEndOf="@id/textView_endingBefore"
+                android:layout_alignTop="@id/textView_endingBefore"
+                android:layout_alignBottom="@id/textView_endingBefore"
+                android:layout_marginStart="8dp" />
+        </RelativeLayout>
+
+        <include
+            layout="@layout/days_checkboxes"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp" />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="20dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_courseKeywords"
+                android:labelFor="@id/editText_courseKeywords"
+                android:layout_alignTop="@id/editText_courseKeywords"
+                android:layout_alignBottom="@id/editText_courseKeywords"
+                android:gravity="center_vertical"
+                android:textSize="18sp"
+                android:text="@string/search_sections_courseKeywords" />
+
+            <EditText
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText_courseKeywords"
+                android:inputType="text"
+                android:layout_toEndOf="@id/textView_courseKeywords"
+                android:layout_marginStart="8dp"
+                android:importantForAutofill="no" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_location"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/spinner_location"
+                android:textSize="18sp"
+                android:text="@string/search_sections_location" />
+
+            <Spinner
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/spinner_location"
+                android:layout_alignParentEnd="true"
+                android:layout_alignTop="@id/textView_location"
+                android:layout_alignBottom="@id/textView_location" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_academicLevel"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/spinner_academicLevel"
+                android:textSize="18sp"
+                android:text="@string/search_sections_academicLevel" />
+
+            <Spinner
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/spinner_academicLevel"
+                android:layout_alignParentEnd="true"
+                android:layout_alignTop="@id/textView_academicLevel"
+                android:layout_alignBottom="@id/textView_academicLevel" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_instructorsLastName"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/spinner_instructorsLastName"
+                android:textSize="18sp"
+                android:text="@string/search_sections_instructorsLastName" />
+
+            <Spinner
+                android:layout_width="150dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/spinner_instructorsLastName"
+                android:layout_alignParentEnd="true"
+                android:layout_alignTop="@id/textView_instructorsLastName"
+                android:layout_alignBottom="@id/textView_instructorsLastName" />
+        </RelativeLayout>
+
+        <Button
+            android:layout_width="fill_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/button_submitSearch"
+            android:layout_marginTop="30dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/search_sections_submit" />
+
+    </LinearLayout>
+
+</ScrollView>

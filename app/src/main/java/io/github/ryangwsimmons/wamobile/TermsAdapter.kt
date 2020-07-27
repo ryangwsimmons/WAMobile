@@ -53,7 +53,7 @@ class TermsAdapter(private var terms: List<Term>, private val listener: OnTermCl
 
     //Assign the values in the view holder to the values from the terms list
     override fun onBindViewHolder(holder: TermViewwHolder, position: Int) {
-        val currentTerm = terms[position]
+        val currentTerm = this.terms[position]
 
         holder.longName.text = currentTerm.longName
         holder.shortName.text = currentTerm.shortName
@@ -62,7 +62,7 @@ class TermsAdapter(private var terms: List<Term>, private val listener: OnTermCl
     }
 
     //Set the size of the recycler view to the number of terms in the list
-    override fun getItemCount() = terms.size
+    override fun getItemCount() = this.terms.size
 
     //Update the list of items
     fun setItems(newTerms: List<Term>) {

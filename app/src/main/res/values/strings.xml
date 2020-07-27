@@ -4,10 +4,28 @@
     <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
     <string name="login_button_text">Login</string>
+
+    <string name="search_sections_term">Term:</string>
+    <string name="search_sections_subject">Subject:</string>
+    <string name="search_sections_courseLevel">Course Level:</string>
+    <string name="search_sections_courseNum">Course Number:</string>
+    <string name="search_sections_section">Section:</string>
+    <string name="search_sections_meetingAfter">Sections Meeting After:</string>
+    <string name="search_sections_endingBefore">Sections Ending Before:</string>
+    <string name="search_sections_courseKeywords">Course Title Keyword(s):</string>
+    <string name="search_sections_location">Location:</string>
+    <string name="search_sections_academicLevel">Academic Level:</string>
+    <string name="search_sections_instructorsLastName">Instructor\'s Last Name:</string>
+    <string name="search_sections_submit">Submit</string>
+
+    <string name="threeletterweek_monday">Mon</string>
+    <string name="threeletterweek_tuesday">Tue</string>
+    <string name="threeletterweek_wednesday">Wed</string>
+    <string name="threeletterweek_thursday">Thu</string>
+    <string name="threeletterweek_friday">Fri</string>
+    <string name="threeletterweek_saturday">Sat</string>
+    <string name="threeletterweek_sunday">Sun</string>
+
     <string name="title_activity_grade_view">GradeViewActivity</string>
-    <!--
-    This string is used for square devices and overridden by hello_world in
-    values-round/strings.xml for round devices.
-    -->
-    <string name="hello_world">Hello Square World!</string>
+    <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

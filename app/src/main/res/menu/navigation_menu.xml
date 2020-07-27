@@ -7,6 +7,18 @@
             android:id="@+id/menuItem_news"
             android:title="News" />
 
+        <item android:title="Registration">
+            <menu>
+                <group android:checkableBehavior="single">
+
+                    <item
+                        android:id="@+id/menuItem_searchSections"
+                        android:title="Search for Sections" />
+
+                </group>
+            </menu>
+        </item>
+
         <item android:title="Academic Profile">
             <menu>
                 <group android:checkableBehavior="single">

@@ -20,7 +20,7 @@ class NavMenuItemListener(private val session: WASession,
                 item.setChecked(true)
 
                 val fragmentTransaction: FragmentTransaction = this.fragmentManager.beginTransaction()
-                fragmentTransaction.replace(R.id.fragmentHolder, NewsFragment(this.actionBar))
+                fragmentTransaction.replace(R.id.fragmentHolder, NewsFragment(this.session, this.actionBar))
                 fragmentTransaction.commit()
 
                 this.drawerLayout.closeDrawers()
@@ -32,6 +32,17 @@ class NavMenuItemListener(private val session: WASession,
 
                 val fragmentTransaction: FragmentTransaction = this.fragmentManager.beginTransaction()
                 fragmentTransaction.replace(R.id.fragmentHolder, GradesFragment(this.session, this.actionBar))
+                fragmentTransaction.commit()
+
+                this.drawerLayout.closeDrawers()
+                return true
+            }
+
+            R.id.menuItem_searchSections -> {
+                item.setChecked(true)
+
+                val fragmentTransaction: FragmentTransaction = this.fragmentManager.beginTransaction()
+                fragmentTransaction.replace(R.id.fragmentHolder, SearchSectionsFragment(this.session, this.actionBar))
                 fragmentTransaction.commit()
 
                 this.drawerLayout.closeDrawers()
