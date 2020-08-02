@@ -40,14 +40,9 @@ class NewsAdapter(private var newsItems: List<NewsItem>, private val context: Co
 
         holder.heading1.text = currentItem.heading1
         holder.heading2.text = currentItem.heading2
-        if (android.os.Build.VERSION.SDK_INT > 23) {
-            holder.body.text = Html.fromHtml(currentItem.body, Html.FROM_HTML_MODE_COMPACT)
-        } else {
-            holder.body.text = Html.fromHtml(currentItem.body)
-        }
+        holder.body.text = currentItem.body
 
         //Enable links in the news body
-        Linkify.addLinks(holder.body, Linkify.ALL)
         holder.body.movementMethod = LinkMovementMethod.getInstance()
         holder.body.linksClickable = true
     }

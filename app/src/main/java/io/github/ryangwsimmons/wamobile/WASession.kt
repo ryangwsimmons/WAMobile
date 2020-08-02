@@ -1,14 +1,14 @@
 package io.github.ryangwsimmons.wamobile
 
 import android.os.Parcelable
+import android.text.Html
+import android.text.Spanned
 import kotlinx.android.parcel.Parcelize
 import org.jsoup.Connection.Method
 import org.jsoup.Connection.Response
 import org.jsoup.Jsoup
 import org.jsoup.nodes.Document
 import org.jsoup.nodes.Element
-import org.jsoup.select.Elements
-import java.io.Serializable
 
 import kotlin.collections.Map
 
@@ -221,21 +221,370 @@ class WASession(private val username: String, private val password: String, priv
         var doc: Document = res.parse()
 
         //Loop through all the news items on the page, adding each item to the ArrayList of news items
-        for (i in 0..(doc.getElementById("content").getElementsByClass("customText").last().getElementsByTag("h1").size - 1)) {
-            //Get the main heading of a particular news item
-            val heading1: String = doc.getElementById("content").getElementsByClass("customText").last().getElementsByTag("h1")[i].text()
+        var studentGroup: String = ""
+        var itemHeading: String = ""
+        var itemBody: Spanned
+        var i: Int = 0
+        for (customText: Element in doc.getElementById("content").getElementsByClass("customText")) {
+            if (customText.getElementsByTag("h1").size > 0 && customText.getElementsByTag("h2").size > 0 && customText.getElementsByTag("p").size > 0) {
+                for (element: Element in customText.children()) {
+                    //Get the main heading of a particular news item
+                    if (element.tagName() == "h1") {
+                        studentGroup = element.text()
+                    }
 
-            //Get the subheading of a particular news item
-            val heading2: String = doc.getElementById("content").getElementsByClass("customText").last().getElementsByTag("h2")[i].text()
+                    //Get the subheading of a particular news item
+                    if (element.tagName() == "h2") {
+                        itemHeading = element.text()
+                    }
 
-            //Get the body of a particular news item
-            val body: String = doc.getElementById("content").getElementsByClass("customText").last().getElementsByTag("p")[i].html()
-
-            //Create a new NewsItem object, and add it to the ArrayList
-            newsItems.add(NewsItem(heading1, heading2, body))
+                    //Get the body of a particular news item, create new NewsItem object, and add the item to it
+                    if (element.tagName() == "p") {
+                        if (android.os.Build.VERSION.SDK_INT > 23) {
+                            itemBody = Html.fromHtml(element.html(), Html.FROM_HTML_MODE_COMPACT)
+                        } else {
+                            itemBody = Html.fromHtml(element.html())
+                        }
+                        newsItems.add(NewsItem(itemHeading, studentGroup, itemBody))
+                    }
+                }
+            }
         }
 
         //Return the resulting list of news items
         return newsItems
+    }
+
+    @Throws(Exception::class)
+    private suspend fun getSearchSectionsResponse(): Response {
+        //Check that a connection has been initialized
+        if (this.homeCookies.size == 0) {
+            throw Exception("Error: The connection has not yet been initialized.")
+        }
+
+        //Connect to the WebAdvisor search for sections filter page
+        var res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + this.homeCookies.get("LASTTOKEN") + "&CONSTITUENCY=WBST&type=P&pid=ST-WESTS12A")
+            .cookies(this.homeCookies)
+            .followRedirects(true)
+            .execute()
+
+        //Return the response
+        return res
+    }
+
+    @Throws(Exception::class)
+    public suspend fun getSearchSectionsFilterValues(terms: ArrayList<DropdownOption>,
+                                                    subjects: ArrayList<DropdownOption>,
+                                                    courseLevels: ArrayList<DropdownOption>,
+                                                    times: ArrayList<DropdownOption>,
+                                                    locations: ArrayList<DropdownOption>,
+                                                    academicLevels: ArrayList<DropdownOption>) {
+        //Check that a connection has been initialized
+        if (this.homeCookies.size == 0) {
+            throw Exception("Error: The connection has not yet been initialized.")
+        }
+
+        //Connect to the WebAdvisor search for sections filter page, and get the response
+        val res: Response = this.getSearchSectionsResponse()
+
+        //Parse the resulting document's HTML
+        val doc: Document = res.parse()
+
+        //Get the list of terms
+        for (term: Element in doc.getElementById("VAR1").getElementsByTag("option")) {
+            //Get the name of the term option
+            val name: String = term.text()
+
+            //Get the value of the term option
+            val value: String = term.attr("value")
+
+            //Add the term option to the ArrayList of terms
+            terms.add(DropdownOption(name, value))
+        }
+
+        //Get the list of subjects
+        for (subject: Element in doc.getElementById("LIST_VAR1_1").getElementsByTag("option")) {
+            //Get the name of the subject option
+            val name: String = subject.text()
+
+            //Get the value of the subject option
+            val value: String = subject.attr("value")
+
+            //Add the subject option to the ArrayList of subjects
+            subjects.add(DropdownOption(name, value))
+        }
+
+        //Get the list of course levels
+        for (courseLevel: Element in doc.getElementById("LIST_VAR2_1").getElementsByTag("option")) {
+            //Get the name of the course level option
+            val name: String = courseLevel.text()
+
+            //Get the value of the course level option
+            val value: String = courseLevel.attr("value")
+
+            //Add the course level option to the ArrayList of course levels
+            courseLevels.add(DropdownOption(name, value))
+        }
+
+        //Get the list of times
+        for (time: Element in doc.getElementById("VAR7").getElementsByTag("option")) {
+            //Get the name of the time option
+            val name: String = time.text()
+
+            //Get the value of the time option
+            val value: String = time.attr("value")
+
+            //Add the time option to the ArrayList of times
+            times.add(DropdownOption(name, value))
+        }
+
+        //Get the list of locations
+        for (location: Element in doc.getElementById("VAR6").getElementsByTag("option")) {
+            //Get the name of the location option
+            val name: String = location.text()
+
+            //Get the value of the location option
+            val value: String = location.attr("value")
+
+            //Add the location option to the ArrayList of locations
+            locations.add(DropdownOption(name, value))
+        }
+
+        //Get the list of academic levels
+        for (academicLevel: Element in doc.getElementById("VAR21").getElementsByTag("option")) {
+            //Get the name of the academic level option
+            val name: String = academicLevel.text()
+
+            //Get the value of the academic level option
+             val value: String = academicLevel.attr("value")
+
+            //Add the academic level option to the ArrayList of academic levels
+            academicLevels.add(DropdownOption(name, value))
+        }
+    }
+
+    private suspend fun formatMeeting(meetingString: String): String {
+        //Function to format meeting strings into how they should look, given a WebAdvisor unformatted meeting string
+        //Full disclosure - while all of the code written below is my own, some of the logic is derived from the same logic used to format the meetings on the actual WebAdvisor page
+        //By making my formatting logic similar to the actual WebAdvisor formatting logic, I can handle any edge cases I might have otherwise missed
+
+        var meeting: String = meetingString
+        //If a meeting only contains dates, returns true, otherwise false
+        fun isDatesOnly(meetingInfo: List<String>): Boolean {
+            return meetingInfo.size <= 2
+        }
+
+        //Gets the location of a meeting
+        fun getLocation(meetingInfo: List<String>): String? {
+            if (!isDatesOnly(meetingInfo)) {
+                return meetingInfo[5].trim()
+            }
+            return null
+        }
+
+        //Regular expression that checks if the meeting string is just dates
+        var regex: Regex = Regex("^(\\d{4}\\/\\d{2}\\/\\d{2})-(\\d{4}\\/\\d{2}\\/\\d{2})$")
+
+        if (regex.matches(meeting)) {
+            //If just dates, put a "|" between the start and end dates
+            meeting = regex.replace(meeting, "$1|$2")
+        } else {
+            //If not just dates, replace all duplicate values in the meeting string
+            meeting = meeting.replace("Days TBA Days TBA", "Days TBA").replace("Times TBA Times TBA", "Times TBA").replace("Room TBA Room TBA", "Room TBA")
+            //Use a regular expression to put "|" between all the different properties of the meeting
+            regex = Regex("^(\\d{4}\\/\\d{2}\\/\\d{2})-(\\d{4}\\/\\d{2}\\/\\d{2}) (LEC|LAB|SEM|EXAM|Distance Education|Electronic) ((Mon,? ?|Tues,? ?|Wed,? ?|Thur,? ?|Fri,? ?|Sat,? ?|Sun,? ?|Days TBA|Days to be Announced){1,7}),? ?(\\d{2}:\\d{2}[AP]M - \\d{2}:\\d{2}[AP]M|Times TBA|Times to be Announced),? ?(.*Room[^,]*)$")
+            meeting = regex.replace(meeting, "$1|$2|$3|$4|$6|$7")
+        }
+
+        //Create a list of meeting properties by splitting the meeting string using "|" as a delimiter
+        val meetingProps: List<String> = meeting.split("|")
+
+        //Get the meeting method
+        var method: String
+        if (!isDatesOnly(meetingProps)) {
+             method = meetingProps[2].trim()
+        } else {
+            method = ""
+        }
+
+        //Get the meeting days, if available
+        var days: String
+        if (!isDatesOnly(meetingProps)) {
+            days = meetingProps[3].trim()
+        } else {
+            days = ""
+        }
+
+        //Get the meeting time, if available
+        var time: String
+        if (!isDatesOnly(meetingProps)) {
+            time = meetingProps[4].trim()
+        } else {
+            time = ""
+        }
+
+        //Get the meeting end date
+        val end: String = meetingProps[1].trim()
+
+        //Get the meeting building, if available
+        var building: String
+        if (!isDatesOnly(meetingProps)) {
+            val location = getLocation(meetingProps)
+            if (location != null) {
+                val locationArray = location.split(", ")
+                if (locationArray.size > 1) {
+                    building = locationArray[0]
+                } else {
+                    building = ""
+                }
+            } else {
+                building = ""
+            }
+        } else {
+            building = ""
+        }
+
+        //Get the meeting room, if available
+        var room: String
+        if (!isDatesOnly(meetingProps)) {
+            val location = getLocation(meetingProps)
+            if (location != null) {
+                val locationArray = location.split(", ")
+                if (locationArray.size > 1) {
+                    room = locationArray[1]
+                } else {
+                    room = locationArray[0]
+                }
+            } else {
+                room = ""
+            }
+        } else {
+            room = ""
+        }
+
+        if (isDatesOnly(meetingProps) == false && (method == "" || days == "" || time == "" || room == "")) {
+            //If the meeting is not just dates, and one of the key meeting properties is missing, return the original string
+            return meetingString
+        } else if (isDatesOnly(meetingProps) == false) {
+            //Otherwise, construct the formatted meeting string
+            var meetingFormatted: StringBuilder = StringBuilder()
+
+            //Create the method and days line
+            meetingFormatted.append(method + " " + days + "\n")
+
+            //If the meeting is an exam, add the exam time and date, otherwise just add the time
+            if (method == "EXAM") {
+                meetingFormatted.append(time + " (" + end + ")\n")
+            } else {
+                meetingFormatted.append(time + "\n")
+            }
+
+            //If the building is available, add it and the room, otherwise add just the room
+            if (building != "") {
+                meetingFormatted.append(building + ", " + room)
+            } else {
+                meetingFormatted.append(room)
+            }
+
+            //Return the formatted meeting string
+            return meetingFormatted.toString()
+        }
+
+        //If the meeting is just two dates, return an empty string
+        return ""
+    }
+
+
+    @Throws(Exception::class)
+    public suspend fun getSearchResults(term: String,
+                                        subjects: ArrayList<String>,
+                                        courseLevels: ArrayList<String>,
+                                        courseNums: ArrayList<String>,
+                                        sections: ArrayList<String>,
+                                        times: ArrayList<String>,
+                                        days: ArrayList<Boolean>,
+                                        courseKeywords: String,
+                                        location: String,
+                                        academicLevel: String,
+                                        instructorsLastName: String): ArrayList<SearchResult> {
+        //Make initial request to filters page
+        var res: Response = this.getSearchSectionsResponse()
+
+        //Create the ArrayList to hold search results
+        var results: ArrayList<SearchResult> = ArrayList<SearchResult>()
+
+        //Create and populate a map that holds the request body
+        var searchForm: HashMap<String, String> = HashMap<String, String>()
+
+        searchForm.put("VAR1", term)
+        searchForm.put("DATE.VAR1", "")
+        searchForm.put("DATE.VAR2", "")
+        searchForm.put("LIST.VAR1_CONTROLLER", "LIST.VAR1")
+        searchForm.put("LIST.VAR1_MEMBERS", "LIST.VAR1*LIST.VAR2*LIST.VAR3*LIST.VAR4")
+        searchForm.put("LIST.VAR1_MAX", "5")
+        searchForm.put("LIST.VAR2_MAX", "5")
+        searchForm.put("LIST.VAR3_MAX", "5")
+        searchForm.put("LIST.VAR4_MAX", "5")
+        subjects.forEachIndexed {index, subject ->
+            searchForm.put("LIST.VAR1_" + (index + 1).toString(), subject)
+            searchForm.put("LIST.VAR2_" + (index + 1).toString(), courseLevels[index])
+            searchForm.put("LIST.VAR3_" + (index + 1).toString(), courseNums[index])
+            searchForm.put("LIST.VAR4_" + (index + 1).toString(), sections[index])
+        }
+        searchForm.put("VAR7", times[0])
+        searchForm.put("VAR8", times[1])
+        days.forEachIndexed {index, day ->
+            searchForm.put("VAR" + (10 + index).toString(), if (day == true) "Y" else "")
+        }
+        searchForm.put("VAR3", courseKeywords)
+        searchForm.put("VAR6", location)
+        searchForm.put("VAR21", academicLevel)
+        searchForm.put("VAR9", instructorsLastName)
+        searchForm.put("RETURN.URL", "https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + this.homeCookies.get("LASTTOKEN") + "&type=M&constituency=WBST&pid=CORE-WBST")
+        searchForm.put("SUBMIT_OPTIONS", "")
+
+        //Make the connection to the server to get the search results page
+        res = Jsoup.connect(res.url().toString())
+            .data(searchForm)
+            .cookies(res.cookies())
+            .method(Method.POST)
+            .followRedirects(true)
+            .execute()
+
+        //Parse the response's HTML
+        val doc: Document = res.parse()
+
+        //Go through the results, parse the HTML for the properties of each section, and add each result into the ArrayList
+        for (result: Element in doc.getElementById("GROUP_Grp_WSS_COURSE_SECTIONS").getElementsByTag("tbody")[0].getElementsByTag("tr")) {
+            if (result.getElementsByTag("td").size > 0) {
+                val term: String = result.getElementsByClass("WSS_COURSE_SECTIONS")[0].getElementsByTag("p")[0].text()
+                val status: String = result.getElementsByClass("LIST_VAR1")[0].getElementsByTag("p")[0].text()
+                val title: String = result.getElementsByClass("SEC_SHORT_TITLE")[0].getElementsByTag("a")[0].text()
+                val location: String = result.getElementsByClass("SEC_LOCATION")[0].getElementsByTag("p")[0].text()
+
+                var meetings: ArrayList<String> = ArrayList<String>()
+                var unformattedMeetingsString: String = result.getElementsByClass("SEC_MEETING_INFO")[0].getElementsByTag("p")[0].text()
+                val regex: Regex = Regex("( |\\n)(\\d{4}\\/\\d{2}\\/\\d{2}|\\/  \\/  )")
+                unformattedMeetingsString = regex.replace(unformattedMeetingsString, {match -> "^" + match.groupValues[2]})
+                val unformattedMeetings = unformattedMeetingsString.split("^")
+                unformattedMeetings.forEachIndexed { index, unformattedMeeting ->
+                    if (index < unformattedMeetings.size - 1) {
+                        meetings.add(formatMeeting(unformattedMeeting) + "\n\n")
+                    } else {
+                        meetings.add(formatMeeting(unformattedMeeting))
+                    }
+                }
+
+                val faculty: String = result.getElementsByClass("SEC_FACULTY_INFO")[0].getElementsByTag("p")[0].text()
+                val availableCapacity: String = result.getElementsByClass("LIST_VAR5")[0].getElementsByTag("p")[0].text()
+                val credits: String = result.getElementsByClass("SEC_MIN_CRED")[0].getElementsByTag("p")[0].text()
+                val academicLevel: String = result.getElementsByClass("SEC_ACAD_LEVEL")[0].getElementsByTag("p")[0].text()
+
+                results.add(SearchResult(term, status, title, location, meetings, faculty, availableCapacity, credits, academicLevel))
+            }
+        }
+
+        //Return the ArrayList of results
+        return results
     }
 }

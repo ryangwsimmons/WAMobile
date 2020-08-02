@@ -1,0 +1,236 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.cardview.widget.CardView
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_margin="4dp">
+
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/relativeLayout_sectionContainer"
+        android:padding="8dp">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_courseTitle"
+            android:textSize="24sp"
+            android:textStyle="bold"
+            android:text="CIS*1000*0101 (0000)\nTest Course Title" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_statusLabel"
+            android:layout_toStartOf="@id/view_verticalDivider"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/textView_section_courseTitle"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:text="@string/section_status" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_status"
+            android:layout_toStartOf="@id/view_verticalDivider"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/textView_section_statusLabel"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:text="Open" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_termLabel"
+            android:layout_toStartOf="@id/view_verticalDivider"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/textView_section_status"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:text="@string/section_term" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_term"
+            android:layout_toStartOf="@id/view_verticalDivider"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/textView_section_termLabel"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:text="Fall 2020" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_facultyLabel"
+            android:layout_toStartOf="@id/view_verticalDivider"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/textView_section_term"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:text="@string/section_faculty" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_faculty"
+            android:layout_toStartOf="@id/view_verticalDivider"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/textView_section_facultyLabel"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:text="TBA TBA" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_academicLevelLabel"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/textView_section_faculty"
+            android:layout_marginTop="4dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:text="@string/section_academicLevel" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_academicLevel"
+            android:layout_toStartOf="@id/view_verticalDivider"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/textView_section_academicLevelLabel"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:text="Undergraduate" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/view_verticalDivider"
+            android:background="#e5e5e5"
+            android:layout_toEndOf="@id/textView_section_academicLevelLabel"
+            android:layout_marginStart="2dp"
+            android:layout_alignTop="@id/textView_section_statusLabel"
+            android:layout_alignBottom="@id/textView_section_academicLevel" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_locationLabel"
+            android:layout_toStartOf="@id/view_verticalDivider2"
+            android:layout_toEndOf="@id/view_verticalDivider"
+            android:layout_alignTop="@id/textView_section_statusLabel"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:text="@string/section_location" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_location"
+            android:layout_toStartOf="@id/view_verticalDivider2"
+            android:layout_toEndOf="@id/view_verticalDivider"
+            android:layout_below="@id/textView_section_locationLabel"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:text="Guelph" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_availableLabel"
+            android:layout_toEndOf="@id/view_verticalDivider"
+            android:layout_below="@id/textView_section_location"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:text="@string/section_available" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_available"
+            android:layout_toStartOf="@id/view_verticalDivider2"
+            android:layout_toEndOf="@id/view_verticalDivider"
+            android:layout_below="@id/textView_section_availableLabel"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:text="0 / 500" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_creditsLabel"
+            android:layout_toStartOf="@id/view_verticalDivider2"
+            android:layout_toEndOf="@id/view_verticalDivider"
+            android:layout_below="@id/textView_section_available"
+            android:layout_marginTop="4dp"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:text="@string/section_credits" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_credits"
+            android:layout_toStartOf="@id/view_verticalDivider2"
+            android:layout_toEndOf="@id/view_verticalDivider"
+            android:layout_below="@id/textView_section_creditsLabel"
+            android:layout_marginStart="8dp"
+            android:layout_marginEnd="8dp"
+            android:textSize="14sp"
+            android:text="0.50" />
+
+        <View
+            android:layout_width="1dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/view_verticalDivider2"
+            android:background="#e5e5e5"
+            android:layout_toEndOf="@id/textView_section_availableLabel"
+            android:layout_marginStart="2dp"
+            android:layout_alignTop="@id/textView_section_statusLabel"
+            android:layout_alignBottom="@id/textView_section_academicLevel" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_meetingsLabel"
+            android:layout_toEndOf="@id/view_verticalDivider2"
+            android:layout_alignTop="@id/textView_section_statusLabel"
+            android:layout_marginStart="8dp"
+            android:textSize="14sp"
+            android:textStyle="bold"
+            android:text="@string/section_meetings" />
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_section_meetings"
+            android:layout_toEndOf="@id/view_verticalDivider2"
+            android:layout_below="@id/textView_section_meetingsLabel"
+            android:layout_marginStart="8dp"
+            android:textSize="14sp"
+            android:text="LEC Mon, Wed, Fri\n12:00AM - 12:00AM\nAD-S, Room Virtual\n\nLAB Mon, Wed, Fri\n12:00AM - 12:00AM\nAD-S, Room Virtual" />
+
+    </RelativeLayout>
+
+</androidx.cardview.widget.CardView>

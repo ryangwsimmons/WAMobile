@@ -25,7 +25,7 @@
                 android:text="@string/search_sections_term" />
 
             <Spinner
-                android:layout_width="150dp"
+                android:layout_width="215dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/spinner_terms"
                 android:layout_toEndOf="@id/textView_term"
@@ -39,8 +39,8 @@
             android:id="@+id/searchSections_filterGroup1"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="50dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
             android:layout_marginTop="20dp" />
 
         <include
@@ -48,8 +48,8 @@
             android:id="@+id/searchSections_filterGroup2"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="50dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
             android:layout_marginTop="20dp" />
 
         <include
@@ -57,8 +57,8 @@
             android:id="@+id/searchSections_filterGroup3"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="50dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
             android:layout_marginTop="20dp" />
 
         <include
@@ -66,8 +66,8 @@
             android:id="@+id/searchSections_filterGroup4"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="50dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
             android:layout_marginTop="20dp" />
 
         <include
@@ -75,54 +75,61 @@
             android:id="@+id/searchSections_filterGroup5"
             android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginStart="50dp"
-            android:layout_marginEnd="50dp"
+            android:layout_marginStart="25dp"
+            android:layout_marginEnd="25dp"
             android:layout_marginTop="20dp" />
 
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
+            android:layout_marginTop="20dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/textView_meetingAfter"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/spinner_meetingAfter"
                 android:textSize="18sp"
                 android:text="@string/search_sections_meetingAfter" />
 
             <Spinner
-                android:layout_width="150dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/spinner_meetingAfter"
-                android:layout_toEndOf="@id/textView_meetingAfter"
+                android:layout_alignParentEnd="true"
                 android:layout_alignTop="@id/textView_meetingAfter"
-                android:layout_alignBottom="@id/textView_meetingAfter"
-                android:layout_marginStart="8dp" />
+                android:layout_alignBottom="@id/textView_meetingAfter" />
         </RelativeLayout>
 
         <RelativeLayout
-            android:layout_width="wrap_content"
+            android:layout_width="fill_parent"
             android:layout_height="wrap_content"
-            android:layout_marginTop="10dp">
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/textView_endingBefore"
+                android:layout_alignParentStart="true"
+                android:layout_toStartOf="@id/spinner_endingBefore"
                 android:textSize="18sp"
                 android:text="@string/search_sections_endingBefore" />
 
             <Spinner
-                android:layout_width="150dp"
+                android:layout_width="160dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/spinner_endingBefore"
-                android:layout_toEndOf="@id/textView_endingBefore"
+                android:layout_alignParentEnd="true"
                 android:layout_alignTop="@id/textView_endingBefore"
-                android:layout_alignBottom="@id/textView_endingBefore"
-                android:layout_marginStart="8dp" />
+                android:layout_alignBottom="@id/textView_endingBefore" />
         </RelativeLayout>
 
         <include
             layout="@layout/days_checkboxes"
+            android:id="@+id/days_checkboxes"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp" />
@@ -168,7 +175,7 @@
                 android:text="@string/search_sections_location" />
 
             <Spinner
-                android:layout_width="150dp"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/spinner_location"
                 android:layout_alignParentEnd="true"
@@ -192,7 +199,7 @@
                 android:text="@string/search_sections_academicLevel" />
 
             <Spinner
-                android:layout_width="150dp"
+                android:layout_width="200dp"
                 android:layout_height="wrap_content"
                 android:id="@+id/spinner_academicLevel"
                 android:layout_alignParentEnd="true"
@@ -201,7 +208,7 @@
         </RelativeLayout>
 
         <RelativeLayout
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="10dp"
             android:layout_marginStart="16dp"
@@ -210,18 +217,21 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:id="@+id/textView_instructorsLastName"
-                android:layout_alignParentStart="true"
-                android:layout_toStartOf="@id/spinner_instructorsLastName"
+                android:labelFor="@id/editText_instructorsLastName"
+                android:layout_alignTop="@id/editText_instructorsLastName"
+                android:layout_alignBottom="@id/editText_instructorsLastName"
+                android:gravity="center_vertical"
                 android:textSize="18sp"
                 android:text="@string/search_sections_instructorsLastName" />
 
-            <Spinner
+            <EditText
                 android:layout_width="150dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/spinner_instructorsLastName"
-                android:layout_alignParentEnd="true"
-                android:layout_alignTop="@id/textView_instructorsLastName"
-                android:layout_alignBottom="@id/textView_instructorsLastName" />
+                android:id="@+id/editText_instructorsLastName"
+                android:inputType="text"
+                android:layout_toEndOf="@id/textView_instructorsLastName"
+                android:layout_marginStart="8dp"
+                android:importantForAutofill="no" />
         </RelativeLayout>
 
         <Button

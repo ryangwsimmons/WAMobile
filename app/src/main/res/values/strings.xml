@@ -26,6 +26,15 @@
     <string name="threeletterweek_saturday">Sat</string>
     <string name="threeletterweek_sunday">Sun</string>
 
+    <string name="section_status">Status:</string>
+    <string name="section_location">Location:</string>
+    <string name="section_term">Term:</string>
+    <string name="section_faculty">Faculty:</string>
+    <string name="section_available">Available:</string>
+    <string name="section_credits">Credits:</string>
+    <string name="section_academicLevel">Academic Level:</string>
+    <string name="section_meetings">Meeting Information:</string>
+
     <string name="title_activity_grade_view">GradeViewActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>
