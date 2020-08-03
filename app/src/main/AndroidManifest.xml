@@ -11,7 +11,8 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
-        <activity android:name=".SearchResultsActivity"></activity>
+        <activity android:name=".SectionDetailsActivity"></activity>
+        <activity android:name=".SearchResultsActivity" />
         <activity
             android:name=".GradeViewActivity"
             android:label="@string/title_activity_grade_view" />

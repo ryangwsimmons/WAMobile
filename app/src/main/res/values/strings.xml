@@ -35,6 +35,18 @@
     <string name="section_academicLevel">Academic Level:</string>
     <string name="section_meetings">Meeting Information:</string>
 
+    <string name="sectionDetails_description">Description:</string>
+    <string name="sectionDetails_offerings">Offering(s):</string>
+    <string name="sectionDetails_restrictions">Restriction(s):</string>
+    <string name="sectionDetails_prereqs">Prerequisite(s):</string>
+    <string name="sectionDetails_departments">Department(s):</string>
+    <string name="sectionDetails_startDate">Start Date:</string>
+    <string name="sectionDetails_endDate">End Date:</string>
+    <string name="sectionDetails_facultyName">Faculty Name:</string>
+    <string name="sectionDetails_facultyEmail">Email:</string>
+    <string name="sectionDetails_facultyPhone">Phone:</string>
+    <string name="sectionDetails_facultyExtension">Extension:</string>
+
     <string name="title_activity_grade_view">GradeViewActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
 </resources>

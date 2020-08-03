@@ -72,7 +72,7 @@ class WASession(private val username: String, private val password: String, priv
                               .getElementsByTag("h1").get(0)
                               .getElementsByClass("department").get(0)
                               .getElementsByTag("a").text()
-                              .substring(15)
+        name = "(?<=WebAdvisor for ).*$".toRegex(RegexOption.IGNORE_CASE).find(name)!!.value
 
         //Return the name
         return name
@@ -506,7 +506,8 @@ class WASession(private val username: String, private val password: String, priv
                                         courseKeywords: String,
                                         location: String,
                                         academicLevel: String,
-                                        instructorsLastName: String): ArrayList<SearchResult> {
+                                        instructorsLastName: String,
+                                        cookies: MutableMap<String, String>): ArrayList<SearchResult> {
         //Make initial request to filters page
         var res: Response = this.getSearchSectionsResponse()
 
@@ -551,6 +552,9 @@ class WASession(private val username: String, private val password: String, priv
             .followRedirects(true)
             .execute()
 
+        //Store the cookies from the response in the parameter
+        cookies.putAll(res.cookies())
+
         //Parse the response's HTML
         val doc: Document = res.parse()
 
@@ -580,11 +584,73 @@ class WASession(private val username: String, private val password: String, priv
                 val credits: String = result.getElementsByClass("SEC_MIN_CRED")[0].getElementsByTag("p")[0].text()
                 val academicLevel: String = result.getElementsByClass("SEC_ACAD_LEVEL")[0].getElementsByTag("p")[0].text()
 
-                results.add(SearchResult(term, status, title, location, meetings, faculty, availableCapacity, credits, academicLevel))
+                //Extract the details URL parameters from the onclick attribute of the title link, and replace the initial "?? with an "&" so that it can be added onto the end of a URL
+                val detailsURL: String = "(?<=')(.*?)(?=')".toRegex().find(result.getElementsByClass("SEC_SHORT_TITLE")[0].getElementsByTag("a")[0].attr("onclick"))!!.value.replace("&CLONE=Y", "")
+
+                results.add(SearchResult(term, status, title, location, meetings, faculty, availableCapacity, credits, academicLevel, detailsURL))
             }
         }
 
         //Return the ArrayList of results
         return results
+    }
+
+    public suspend fun getSectionDetails(cookies: Map<String, String>, result: SearchResult): SectionDetails {
+        //Make the connection to the server
+        var res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor" + result.detailsURL)
+            .cookies(cookies)
+            .followRedirects(true)
+            .execute()
+
+        val doc: Document = res.parse()
+
+        //Get the course name and split it into sections
+        val courseNameSections: List<String> = doc.getElementById("VAR2").text().split("*")
+
+        //Get the course name without the section, in all lowercase
+        val courseName: String = (courseNameSections[0] + courseNameSections[1]).toLowerCase()
+
+        //Create a variable that holds the url for the course calendar, and populate it based on the academic level of the course
+        var calendarURL: String = ""
+        when (result.academicLevel) {
+            "Diploma" -> calendarURL = "https://www.uoguelph.ca/registrar/calendars/diploma/current/courses/"
+            "Graduate" -> calendarURL = "https://www.uoguelph.ca/registrar/calendars/graduate/current/courses/"
+            "Undergraduate" -> calendarURL = "https://www.uoguelph.ca/registrar/calendars/undergraduate/current/courses/"
+            "Undergraduate Guelph-Humber" -> calendarURL = "https://www.uoguelph.ca/registrar/calendars/guelphhumber/current/courses/"
+        }
+
+        //Connect to the calendar page
+        res = Jsoup.connect(calendarURL + courseName + ".shtml")
+            .followRedirects(true)
+            .execute()
+
+        //Parse the calendar document
+        val calDoc: Document = res.parse()
+
+        //Get the section details, and store them in variables
+        val title: String = calDoc.getElementById("content").getElementsByClass("title")[0].text()
+        val description: String = calDoc.getElementById("content").getElementsByClass("description")[0].text()
+        var offerings: String = ""
+        if (calDoc.getElementById("content").getElementsByClass("offerings").size > 0) {
+            offerings = calDoc.getElementById("content").getElementsByClass("offerings")[0].getElementsByClass("text")[0].text()
+        }
+        var restrctions: String = ""
+        if (calDoc.getElementById("content").getElementsByClass("restrictions").size > 0) {
+            restrctions = calDoc.getElementById("content").getElementsByClass("restrictions")[0].getElementsByClass("text")[0].text()
+        }
+        var prereqs: String = ""
+        if (calDoc.getElementById("content").getElementsByClass("prereqs").size > 0){
+            prereqs = calDoc.getElementById("content").getElementsByClass("prereqs")[0].getElementsByClass("text")[0].text()
+        }
+        val departments: String = calDoc.getElementById("content").getElementsByClass("departments")[0].getElementsByClass("text")[0].text()
+        val startDate: String = doc.getElementById("VAR6").text()
+        val endDate: String = doc.getElementById("VAR7").text()
+        val facultyName: String = doc.getElementById("LIST_VAR7_1").text()
+        val facultyEmail: String = doc.getElementById("LIST_VAR10_1").text()
+        val facultyPhone: String = doc.getElementById("LIST_VAR8_1").text()
+        val facultyExtension: String = doc.getElementById("LIST_VAR9_1").text()
+
+        //Return a new SectionDetails object containing the data
+        return SectionDetails(title, description, offerings, restrctions, prereqs, departments, startDate, endDate, facultyName, facultyEmail, facultyPhone, facultyExtension)
     }
 }

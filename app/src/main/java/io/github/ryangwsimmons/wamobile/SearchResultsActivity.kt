@@ -1,9 +1,9 @@
 package io.github.ryangwsimmons.wamobile
 
+import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.MenuItem
-import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.Toolbar
@@ -12,13 +12,14 @@ import kotlinx.android.synthetic.main.activity_search_results.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import kotlinx.coroutines.*
 
-class SearchResultsActivity : AppCompatActivity() {
+class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectionClickListener {
 
     private lateinit var toolbar: Toolbar
     private lateinit var actionbar: ActionBar
     private lateinit var session: WASession
 
     private lateinit var results: ArrayList<SearchResult>
+    private lateinit var cookies: HashMap<String, String>
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -55,7 +56,7 @@ class SearchResultsActivity : AppCompatActivity() {
         this.actionbar.title = "Search Results"
 
         //Set up the recycler view settings
-        var adapter: SearchResultsAdapter = SearchResultsAdapter(ArrayList<SearchResult>())
+        var adapter: SearchResultsAdapter = SearchResultsAdapter(ArrayList<SearchResult>(), this)
         recyclerView_sections.adapter = adapter
         recyclerView_sections.layoutManager = LinearLayoutManager(this)
 
@@ -72,7 +73,19 @@ class SearchResultsActivity : AppCompatActivity() {
         //Launch a coroutine to get the search results
         CoroutineScope(errorHandler).launch {
             //Get the list of search results
-            this@SearchResultsActivity.results = this@SearchResultsActivity.session.getSearchResults(term, subjects, courseLevels, courseNums, sections, times, days, courseKeywords, location, academicLevel, instructorsLastName)
+            this@SearchResultsActivity.cookies = HashMap<String, String>()
+            this@SearchResultsActivity.results = this@SearchResultsActivity.session.getSearchResults(term,
+                subjects,
+                courseLevels,
+                courseNums,
+                sections,
+                times,
+                days,
+                courseKeywords,
+                location,
+                academicLevel,
+                instructorsLastName,
+                this@SearchResultsActivity.cookies)
 
             //Update the list of items in the adapter
             withContext(Dispatchers.Main) {
@@ -80,6 +93,21 @@ class SearchResultsActivity : AppCompatActivity() {
                 adapter.notifyItemInserted(this@SearchResultsActivity.results.size - 1)
             }
         }
+    }
+
+    override fun onSectionClick(position: Int) {
+        //Create an intent to change activity
+        val intent = Intent(this, SectionDetailsActivity::class.java).apply {
+            //Set up bundle for passing data into the next activity
+            var bundle: Bundle = Bundle()
+            bundle.putParcelable("session", this@SearchResultsActivity.session)
+            bundle.putParcelable("result", this@SearchResultsActivity.results[position])
+            putExtra("bundle", bundle)
+            putExtra("cookies", this@SearchResultsActivity.cookies)
+        }
+
+        //Start the activity
+        startActivity(intent)
     }
 
     public override fun onOptionsItemSelected(item: MenuItem): Boolean {

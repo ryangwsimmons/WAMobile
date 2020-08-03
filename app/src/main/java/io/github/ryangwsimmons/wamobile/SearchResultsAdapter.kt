@@ -11,10 +11,10 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.recycleritem_section.view.*
 import kotlin.text.StringBuilder
 
-class SearchResultsAdapter(private var results: List<SearchResult>): RecyclerView.Adapter<SearchResultsAdapter.SectionHolder>() {
+class SearchResultsAdapter(private var results: List<SearchResult>, private val listener: OnSectionClickListener): RecyclerView.Adapter<SearchResultsAdapter.SectionHolder>() {
 
     //Create a view holder to hold the data for each section
-    inner class SectionHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
+    inner class SectionHolder(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener {
         val title: TextView = itemView.textView_section_courseTitle
         val status: TextView = itemView.textView_section_status
         val location: TextView = itemView.textView_section_location
@@ -24,6 +24,24 @@ class SearchResultsAdapter(private var results: List<SearchResult>): RecyclerVie
         val credits: TextView = itemView.textView_section_credits
         val academicLevel: TextView = itemView.textView_section_academicLevel
         val meetings: TextView = itemView.textView_section_meetings
+
+        //Set the listener function for the section being clicked to the listener function in this class
+        init {
+            itemView.setOnClickListener(this)
+        }
+
+        //On a section being clicked, trigger the click event in the listener
+        override fun onClick(v: View?) {
+            val position = adapterPosition
+            if (position != RecyclerView.NO_POSITION) {
+                listener.onSectionClick(position)
+            }
+        }
+    }
+
+    //Create an interface for responding to sections being clicked
+    interface OnSectionClickListener {
+        fun onSectionClick(position: Int)
     }
 
     //Write the function that creates ViewHolders to put the sections in
