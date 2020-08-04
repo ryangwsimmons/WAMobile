@@ -4,7 +4,22 @@
     <string name="username_hint">Username</string>
     <string name="password_hint">Password</string>
     <string name="login_button_text">Login</string>
+    <string name="invalid_creds_message">Please enter a valid username and password.</string>
 
+    <string name="network_error">A network error has occurred. Please check your internet connection and try again.</string>
+    <string name="signedIn_message">Signed into WebAdvisor as </string>
+    <string name="exit_message">Press back again to exit</string>
+
+    <string name="termSelect_message">Select Term</string>
+    <string name="termSelect_startDate">Start Date: </string>
+    <string name="termSelect_endDate">End Date: </string>
+
+    <string name="finalGrade_label">Final Grade: </string>
+    <string name="credits_label">Credits: </string>
+
+    <string name="news_title">News</string>
+
+    <string name="sfs_title">Search for Sections</string>
     <string name="search_sections_term">Term:</string>
     <string name="search_sections_subject">Subject:</string>
     <string name="search_sections_courseLevel">Course Level:</string>
@@ -17,6 +32,7 @@
     <string name="search_sections_academicLevel">Academic Level:</string>
     <string name="search_sections_instructorsLastName">Instructor\'s Last Name:</string>
     <string name="search_sections_submit">Submit</string>
+    <string name="sfs_not_enough_fields">Please fill out at least 2 fields</string>
 
     <string name="threeletterweek_monday">Mon</string>
     <string name="threeletterweek_tuesday">Tue</string>
@@ -26,6 +42,7 @@
     <string name="threeletterweek_saturday">Sat</string>
     <string name="threeletterweek_sunday">Sun</string>
 
+    <string name="searchResults_title">Search Results</string>
     <string name="section_status">Status:</string>
     <string name="section_location">Location:</string>
     <string name="section_term">Term:</string>
@@ -35,6 +52,7 @@
     <string name="section_academicLevel">Academic Level:</string>
     <string name="section_meetings">Meeting Information:</string>
 
+    <string name="secdet_title">Section Details</string>
     <string name="sectionDetails_description">Description:</string>
     <string name="sectionDetails_offerings">Offering(s):</string>
     <string name="sectionDetails_restrictions">Restriction(s):</string>
@@ -46,6 +64,9 @@
     <string name="sectionDetails_facultyEmail">Email:</string>
     <string name="sectionDetails_facultyPhone">Phone:</string>
     <string name="sectionDetails_facultyExtension">Extension:</string>
+    <string name="secdet_send_email_prompt">Send Email Using...</string>
+    <string name="secdet_email_unable">Unable to send email, do you have an email app installed?</string>
+    <string name="secdet_phone_unable">Unable to open dialer, is this a phone?</string>
 
     <string name="title_activity_grade_view">GradeViewActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>

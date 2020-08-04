@@ -59,9 +59,9 @@ class GradeViewActivity : AppCompatActivity() {
         //Create an error handler for the coroutine that will be executed to get the grades
         val errorHandler = CoroutineExceptionHandler { _, error ->
             CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(this@GradeViewActivity, error.message ?: "A network error has occurred. Please check your internet connection and try again.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@GradeViewActivity, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 if (error.message != null) {
-                    Toast.makeText(this@GradeViewActivity, "A network error has occurred. Please check your internet connection try again.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@GradeViewActivity, getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 }
             }
         }

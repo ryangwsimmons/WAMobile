@@ -36,7 +36,7 @@ class SectionDetailsActivity : AppCompatActivity() {
         this.actionbar.setDisplayHomeAsUpEnabled(true)
 
         //Set the title of the activity
-        this.actionbar.title = "Section Details"
+        this.actionbar.title = getString(R.string.secdet_title)
 
         //Get data from previous activity
         val bundle: Bundle = intent.getBundleExtra("bundle")!!
@@ -48,9 +48,9 @@ class SectionDetailsActivity : AppCompatActivity() {
         //Create an error handler for the coroutine that will be executed to get the section details
         val errorHandler = CoroutineExceptionHandler { _, error ->
             CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(this@SectionDetailsActivity, error.message ?: "A network error has occurred. Please check your internet connection and try again.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@SectionDetailsActivity, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 if (error.message != null) {
-                    Toast.makeText(this@SectionDetailsActivity, "A network error has occurred. Please check your internet connection try again.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@SectionDetailsActivity, getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -100,9 +100,9 @@ class SectionDetailsActivity : AppCompatActivity() {
 
                             //Start a new activity, allowing the user to send an email using any of the clients they've installed
                             try {
-                                startActivity(Intent.createChooser(intent, "Send Email Using..."))
+                                startActivity(Intent.createChooser(intent, getString(R.string.secdet_send_email_prompt)))
                             } catch(e: Exception) {
-                                Toast.makeText(this@SectionDetailsActivity, "Unable to send email, do you have an email app installed?", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@SectionDetailsActivity, getString(R.string.secdet_email_unable), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }
@@ -130,7 +130,7 @@ class SectionDetailsActivity : AppCompatActivity() {
                             try {
                                 startActivity(intent)
                             } catch(e: Exception) {
-                                Toast.makeText(this@SectionDetailsActivity, "Unable to open dialer, is this a phone?", Toast.LENGTH_SHORT).show()
+                                Toast.makeText(this@SectionDetailsActivity, getString(R.string.secdet_phone_unable), Toast.LENGTH_SHORT).show()
                             }
                         }
                     }

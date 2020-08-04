@@ -27,7 +27,7 @@ class MainActivity : AppCompatActivity() {
 
             //Make sure that a username and password have been entered
             if (username == "" || password == "") {
-                Toast.makeText(applicationContext, "Please enter a valid username and password.", Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, getString(R.string.invalid_creds_message), Toast.LENGTH_SHORT).show()
                 return
             }
 
@@ -37,9 +37,9 @@ class MainActivity : AppCompatActivity() {
             //Handle any errors that occur in the coroutine
             val errorHandler = CoroutineExceptionHandler { _, error ->
                 CoroutineScope(Main).launch {
-                    Toast.makeText(applicationContext, error.message ?: "A network error has occurred. Please check your internet connection and try again.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
                     if (error.message != null) {
-                        Toast.makeText(applicationContext, "An error has occurred. Please check your internet connection try again.", Toast.LENGTH_LONG).show()
+                        Toast.makeText(applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
                     }
                 }
             }

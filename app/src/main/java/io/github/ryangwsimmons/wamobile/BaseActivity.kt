@@ -64,9 +64,9 @@ class BaseActivity : AppCompatActivity() {
         //Handle errors in the coroutine that is launched after this
         val errorHandler = CoroutineExceptionHandler {_, error ->
             CoroutineScope(Main).launch {
-                Toast.makeText(applicationContext, error.message ?: "A network error has occurred. Please check your internet connection and try again.", Toast.LENGTH_LONG).show()
+                Toast.makeText(applicationContext, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 if (error.message != null) {
-                    Toast.makeText(applicationContext, "An error has occurred. Please check your internet connection try again.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -75,7 +75,7 @@ class BaseActivity : AppCompatActivity() {
         CoroutineScope(errorHandler).launch {
             val name = session.getName()
             withContext(Main) {
-                Toast.makeText(applicationContext, "Signed into WebAdvisor as " + name, Toast.LENGTH_SHORT).show()
+                Toast.makeText(applicationContext, getString(R.string.signedIn_message) + name, Toast.LENGTH_SHORT).show()
             }
         }
     }
@@ -94,7 +94,7 @@ class BaseActivity : AppCompatActivity() {
     public override fun onBackPressed() {
         if (isTaskRoot() && !this.doubleBacktoExitPressedOnce) {
             this.doubleBacktoExitPressedOnce = true
-            Toast.makeText(applicationContext, "Press back again to exit", Toast.LENGTH_SHORT).show()
+            Toast.makeText(applicationContext, getString(R.string.exit_message), Toast.LENGTH_SHORT).show()
             Handler(Looper.getMainLooper()).postDelayed(Runnable { this.doubleBacktoExitPressedOnce = false }, 2000)
         } else {
             super.onBackPressed()

@@ -53,7 +53,7 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
         this.actionbar.setDisplayHomeAsUpEnabled(true)
 
         //Set the title of the activity
-        this.actionbar.title = "Search Results"
+        this.actionbar.title = getString(R.string.searchResults_title)
 
         //Set up the recycler view settings
         var adapter: SearchResultsAdapter = SearchResultsAdapter(ArrayList<SearchResult>(), this)
@@ -63,9 +63,9 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
         //Create an error handler for the coroutine that will be executed to get the search results
         val errorHandler = CoroutineExceptionHandler { _, error ->
             CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(this@SearchResultsActivity, error.message ?: "A network error has occurred. Please check your internet connection and try again.", Toast.LENGTH_LONG).show()
+                Toast.makeText(this@SearchResultsActivity, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 if (error.message != null) {
-                    Toast.makeText(this@SearchResultsActivity, "A network error has occurred. Please check your internet connection try again.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(this@SearchResultsActivity, getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 }
             }
         }

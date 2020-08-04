@@ -38,7 +38,7 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
         savedInstanceState: Bundle?
     ): View? {
         //Set the title of the action bar
-        actionBar.title = "Search for Sections"
+        actionBar.title = getString(R.string.sfs_title)
 
         //Initialize the array adapter array lists
         this.subjectAdapters = ArrayList<ArrayAdapter<DropdownOption>>()
@@ -51,9 +51,9 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
         //Create an error handler for the coroutine that will be executed to get the search sections filters
         val errorHandler = CoroutineExceptionHandler { _, error ->
             CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(activity!!.applicationContext, error.message ?: "A network error has occurred. Please check your internet connection and try again.", Toast.LENGTH_LONG).show()
+                Toast.makeText(activity!!.applicationContext, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 if (error.message != null) {
-                    Toast.makeText(activity!!.applicationContext, "A network error has occurred. Please check your internet connection try again.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(activity!!.applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -87,7 +87,7 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
         //Set up a listener for the "submit" button
         listItems.findViewById<Button>(R.id.button_submitSearch).setOnClickListener { v: View ->
             if (this.countFilledFields() < 2) {
-                Toast.makeText(activity!!.applicationContext, "Please fill out at least 2 fields", Toast.LENGTH_SHORT).show()
+                Toast.makeText(activity!!.applicationContext, getString(R.string.sfs_not_enough_fields), Toast.LENGTH_SHORT).show()
             } else {
                 //Create an intent to start the search results activity
                 val intent = Intent(activity!!.applicationContext, SearchResultsActivity::class.java).apply {

@@ -25,7 +25,7 @@ class GradesFragment(private var session: WASession, private var actionBar: Acti
         savedInstanceState: Bundle?
     ): View? {
         //Set the title for this fragment to "Select Term"
-        actionBar.title = "Select Term"
+        actionBar.title = getString(R.string.termSelect_message)
 
         //Get the items in the fragment
         val listItems: View = inflater.inflate(R.layout.fragment_grades, container, false)
@@ -41,9 +41,9 @@ class GradesFragment(private var session: WASession, private var actionBar: Acti
         //Create an error handler for the coroutine that will be executed to get the terms
         val errorHandler = CoroutineExceptionHandler { _, error ->
             CoroutineScope(Main).launch {
-                Toast.makeText(activity!!.applicationContext, error.message ?: "A network error has occurred. Please check your internet connection and try again.", Toast.LENGTH_LONG).show()
+                Toast.makeText(activity!!.applicationContext, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 if (error.message != null) {
-                    Toast.makeText(activity!!.applicationContext, "A network error has occurred. Please check your internet connection try again.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(activity!!.applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 }
             }
         }

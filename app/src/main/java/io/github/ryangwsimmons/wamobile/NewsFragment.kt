@@ -20,7 +20,7 @@ class NewsFragment(private var session: WASession, var actionBar: ActionBar) : F
         savedInstanceState: Bundle?
     ): View? {
         //Change the title of the action bar to "News"
-        actionBar.title = "News"
+        actionBar.title = getString(R.string.news_title)
 
         //Get the items in the fragment
         val listItems: View = inflater.inflate(R.layout.fragment_news, container, false)
@@ -36,9 +36,9 @@ class NewsFragment(private var session: WASession, var actionBar: ActionBar) : F
         //Create an error handler for the coroutine that will be executed to get the news items
         val errorHandler = CoroutineExceptionHandler { _, error ->
             CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(activity!!.applicationContext, error.message ?: "A network error has occurred. Please check your internet connection and try again.", Toast.LENGTH_LONG).show()
+                Toast.makeText(activity!!.applicationContext, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 if (error.message != null) {
-                    Toast.makeText(activity!!.applicationContext, "A network error has occurred. Please check your internet connection try again.", Toast.LENGTH_LONG).show()
+                    Toast.makeText(activity!!.applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 }
             }
         }

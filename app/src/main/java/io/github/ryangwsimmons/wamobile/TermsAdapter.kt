@@ -57,8 +57,8 @@ class TermsAdapter(private var terms: List<Term>, private val listener: OnTermCl
 
         holder.longName.text = currentTerm.longName
         holder.shortName.text = currentTerm.shortName
-        holder.startDate.text = "Start Date: " + currentTerm.startDate
-        holder.endDate.text = "End Date: " + currentTerm.endDate
+        holder.startDate.text = holder.startDate.context.getString(R.string.termSelect_startDate) + currentTerm.startDate
+        holder.endDate.text = holder.endDate.context.getString(R.string.termSelect_endDate) + currentTerm.endDate
     }
 
     //Set the size of the recycler view to the number of terms in the list

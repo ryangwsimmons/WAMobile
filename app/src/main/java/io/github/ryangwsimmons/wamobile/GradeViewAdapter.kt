@@ -30,8 +30,8 @@ class GradeViewAdapter(private var grades: List<Grade>): RecyclerView.Adapter<Gr
 
         holder.courseSection.text = currentGrade.courseSection
         holder.courseTitle.text = currentGrade.courseTitle
-        holder.finalGrade.text = "Final Grade: " + currentGrade.finalGrade
-        holder.credits.text = "Credits: " + currentGrade.credits
+        holder.finalGrade.text = holder.finalGrade.context.getString(R.string.finalGrade_label) + currentGrade.finalGrade
+        holder.credits.text = holder.credits.context.getString(R.string.credits_label) + currentGrade.credits
     }
 
     override fun getItemCount() = this.grades.size

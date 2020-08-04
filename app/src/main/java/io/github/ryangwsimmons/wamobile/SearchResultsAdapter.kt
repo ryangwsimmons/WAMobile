@@ -71,13 +71,13 @@ class SearchResultsAdapter(private var results: List<SearchResult>, private val 
 
         //If the current section is closed (has no available spots), set the background colour of the card to red.
         if (currentResult.status == "Closed") {
-            holder.itemView.relativeLayout_sectionContainer.setBackgroundColor(Color.parseColor("#f7aaaa"))
+            holder.itemView.relativeLayout_sectionContainer.setBackgroundColor(ContextCompat.getColor(holder.itemView.relativeLayout_sectionContainer.context, R.color.colorEmptySection))
             holder.itemView.view_verticalDivider.setBackgroundColor(holder.itemView.textView_section_academicLevelLabel.textColors.defaultColor)
             holder.itemView.view_verticalDivider2.setBackgroundColor(holder.itemView.textView_section_academicLevelLabel.textColors.defaultColor)
         } else {
             holder.itemView.relativeLayout_sectionContainer.setBackgroundColor(ContextCompat.getColor(holder.itemView.relativeLayout_sectionContainer.context, R.color.design_default_color_background))
-            holder.itemView.view_verticalDivider.setBackgroundColor(Color.parseColor("#e5e5e5"))
-            holder.itemView.view_verticalDivider2.setBackgroundColor(Color.parseColor("#e5e5e5"))
+            holder.itemView.view_verticalDivider.setBackgroundColor(ContextCompat.getColor(holder.itemView.view_verticalDivider.context, R.color.colorShaded))
+            holder.itemView.view_verticalDivider2.setBackgroundColor(ContextCompat.getColor(holder.itemView.view_verticalDivider2.context, R.color.colorShaded))
         }
     }
 
