@@ -1,12 +1,14 @@
+@file:Suppress("SpellCheckingInspection")
+
 package io.github.ryangwsimmons.wamobile
 
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
+import androidx.appcompat.app.AppCompatActivity
 import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
@@ -16,7 +18,6 @@ import kotlinx.android.synthetic.main.activity_base.*
 import kotlinx.android.synthetic.main.toolbar_layout.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -38,7 +39,7 @@ class BaseActivity : AppCompatActivity() {
 
         //Get the session object
         val bundle: Bundle = intent.getBundleExtra("bundle")!!
-        this.session = bundle.getParcelable<WASession>("session")!!
+        this.session = bundle.getParcelable("session")!!
 
         //Define the toolbar for the activity
         this.toolbar = toolBar
@@ -80,7 +81,7 @@ class BaseActivity : AppCompatActivity() {
         }
     }
 
-    public override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> {
                 drawerLayout.openDrawer(GravityCompat.START)
@@ -91,11 +92,11 @@ class BaseActivity : AppCompatActivity() {
         return super.onOptionsItemSelected(item)
     }
 
-    public override fun onBackPressed() {
-        if (isTaskRoot() && !this.doubleBacktoExitPressedOnce) {
+    override fun onBackPressed() {
+        if (isTaskRoot && !this.doubleBacktoExitPressedOnce) {
             this.doubleBacktoExitPressedOnce = true
             Toast.makeText(applicationContext, getString(R.string.exit_message), Toast.LENGTH_SHORT).show()
-            Handler(Looper.getMainLooper()).postDelayed(Runnable { this.doubleBacktoExitPressedOnce = false }, 2000)
+            Handler(Looper.getMainLooper()).postDelayed({ this.doubleBacktoExitPressedOnce = false }, 2000)
         } else {
             super.onBackPressed()
         }

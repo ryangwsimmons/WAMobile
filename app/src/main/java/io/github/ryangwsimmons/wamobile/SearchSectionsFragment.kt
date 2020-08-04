@@ -41,9 +41,9 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
         actionBar.title = getString(R.string.sfs_title)
 
         //Initialize the array adapter array lists
-        this.subjectAdapters = ArrayList<ArrayAdapter<DropdownOption>>()
-        this.courseLevelAdapters = ArrayList<ArrayAdapter<DropdownOption>>()
-        this.timeAdapters = ArrayList<ArrayAdapter<DropdownOption>>()
+        this.subjectAdapters = ArrayList()
+        this.courseLevelAdapters = ArrayList()
+        this.timeAdapters = ArrayList()
 
         //Get the items in the fragment
         this.listItems = inflater.inflate(R.layout.fragment_search_sections, container, false)
@@ -61,24 +61,24 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
         //Launch a coroutine to get the search sections filters
         CoroutineScope(errorHandler).launch {
             //Create ArrayLists for all the dropdown options
-            val terms: ArrayList<DropdownOption> = ArrayList<DropdownOption>()
-            val subjects: ArrayList<DropdownOption> = ArrayList<DropdownOption>()
-            val courseLevels: ArrayList<DropdownOption> = ArrayList<DropdownOption>()
-            val timesList: ArrayList<DropdownOption> = ArrayList<DropdownOption>()
-            val locations: ArrayList<DropdownOption> = ArrayList<DropdownOption>()
-            val academicLevels: ArrayList<DropdownOption> = ArrayList<DropdownOption>()
+            val terms: ArrayList<DropdownOption> = ArrayList()
+            val subjects: ArrayList<DropdownOption> = ArrayList()
+            val courseLevels: ArrayList<DropdownOption> = ArrayList()
+            val timesList: ArrayList<DropdownOption> = ArrayList()
+            val locations: ArrayList<DropdownOption> = ArrayList()
+            val academicLevels: ArrayList<DropdownOption> = ArrayList()
 
             //Populate all the ArrayLists with the options
             this@SearchSectionsFragment.session.getSearchSectionsFilterValues(terms, subjects, courseLevels, timesList, locations, academicLevels)
 
             withContext(Dispatchers.Main) {
                 //Initialize all the adapters and spinners
-                this@SearchSectionsFragment.subjects = ArrayList<Spinner>()
-                this@SearchSectionsFragment.courseLevels = ArrayList<Spinner>()
-                this@SearchSectionsFragment.courseNums = ArrayList<EditText>()
-                this@SearchSectionsFragment.sections = ArrayList<EditText>()
-                this@SearchSectionsFragment.times = ArrayList<Spinner>()
-                this@SearchSectionsFragment.days = ArrayList<CheckBox>()
+                this@SearchSectionsFragment.subjects = ArrayList()
+                this@SearchSectionsFragment.courseLevels = ArrayList()
+                this@SearchSectionsFragment.courseNums = ArrayList()
+                this@SearchSectionsFragment.sections = ArrayList()
+                this@SearchSectionsFragment.times = ArrayList()
+                this@SearchSectionsFragment.days = ArrayList()
 
                 this@SearchSectionsFragment.initializeAdapters(terms, subjects, courseLevels, timesList, locations, academicLevels)
             }
@@ -92,7 +92,7 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
                 //Create an intent to start the search results activity
                 val intent = Intent(activity!!.applicationContext, SearchResultsActivity::class.java).apply {
                     //Create a bundle for passing data to the new activity, and add the data to it
-                    var bundle: Bundle = Bundle()
+                    val bundle: Bundle = Bundle()
 
                     bundle.putParcelable("session", this@SearchSectionsFragment.session)
                     bundle.putString("term", (this@SearchSectionsFragment.listItems.findViewById<Spinner>(R.id.spinner_terms).selectedItem as DropdownOption).value)
@@ -119,55 +119,55 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
         return listItems
     }
 
-    private suspend fun initializeAdapters(terms: ArrayList<DropdownOption>,
+    private fun initializeAdapters(terms: ArrayList<DropdownOption>,
                                    subjects: ArrayList<DropdownOption>,
                                    courseLevels: ArrayList<DropdownOption>,
                                    times: ArrayList<DropdownOption>,
                                    locations: ArrayList<DropdownOption>,
                                    academicLevels: ArrayList<DropdownOption>) {
         //Initialize the terms adapter and spinner
-        this.termsAdapter = ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, terms)
+        this.termsAdapter = ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, terms)
         this.listItems.findViewById<Spinner>(R.id.spinner_terms).adapter = this.termsAdapter
 
         //Initialize the subject adapters and spinners
-        this.subjectAdapters.add(ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
+        this.subjectAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
         this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup1).spinner_subject.adapter = this.subjectAdapters[0]
         this.subjects.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup1).spinner_subject)
 
-        this.subjectAdapters.add(ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
+        this.subjectAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
         this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup2).spinner_subject.adapter = this.subjectAdapters[1]
         this.subjects.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup2).spinner_subject)
 
-        this.subjectAdapters.add(ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
+        this.subjectAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
         this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup3).spinner_subject.adapter = this.subjectAdapters[2]
         this.subjects.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup3).spinner_subject)
 
-        this.subjectAdapters.add(ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
+        this.subjectAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
         this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup4).spinner_subject.adapter = this.subjectAdapters[3]
         this.subjects.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup4).spinner_subject)
 
-        this.subjectAdapters.add(ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
+        this.subjectAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
         this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup5).spinner_subject.adapter = this.subjectAdapters[4]
         this.subjects.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup5).spinner_subject)
 
         //Initialize the course level adapters and spinners
-        this.courseLevelAdapters.add(ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
+        this.courseLevelAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
         this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup1).spinner_courseLevel.adapter = this.courseLevelAdapters[0]
         this.courseLevels.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup1).spinner_courseLevel)
 
-        this.courseLevelAdapters.add(ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
+        this.courseLevelAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
         this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup2).spinner_courseLevel.adapter = this.courseLevelAdapters[1]
         this.courseLevels.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup2).spinner_courseLevel)
 
-        this.courseLevelAdapters.add(ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
+        this.courseLevelAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
         this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup3).spinner_courseLevel.adapter = this.courseLevelAdapters[2]
         this.courseLevels.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup3).spinner_courseLevel)
 
-        this.courseLevelAdapters.add(ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
+        this.courseLevelAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
         this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup4).spinner_courseLevel.adapter = this.courseLevelAdapters[3]
         this.courseLevels.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup4).spinner_courseLevel)
 
-        this.courseLevelAdapters.add(ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
+        this.courseLevelAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
         this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup5).spinner_courseLevel.adapter = this.courseLevelAdapters[4]
         this.courseLevels.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup5).spinner_courseLevel)
 
@@ -194,13 +194,13 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
         this.sections.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup5).editText_section)
 
         //Initialize the adapters and spinners that involve times
-        this.timeAdapters.add(ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, times))
+        this.timeAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, times))
         this.listItems.findViewById<Spinner>(R.id.spinner_meetingAfter).adapter = this.timeAdapters[0]
-        this.times.add(this.listItems.findViewById<Spinner>(R.id.spinner_meetingAfter))
+        this.times.add(this.listItems.findViewById(R.id.spinner_meetingAfter))
 
-        this.timeAdapters.add(ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, times))
+        this.timeAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, times))
         this.listItems.findViewById<Spinner>(R.id.spinner_endingBefore).adapter = this.timeAdapters[1]
-        this.times.add(this.listItems.findViewById<Spinner>(R.id.spinner_endingBefore))
+        this.times.add(this.listItems.findViewById(R.id.spinner_endingBefore))
 
         //Initialize the checkboxes for days
         this.days.add(this.listItems.findViewById<CheckBox>(R.id.days_checkboxes).checkbox_mon)
@@ -218,11 +218,11 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
         this.days.add(this.listItems.findViewById<CheckBox>(R.id.days_checkboxes).checkbox_sun)
 
         //Initialize the location adapter and spinner
-        this.locationAdapter = ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, locations)
+        this.locationAdapter = ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, locations)
         this.listItems.findViewById<Spinner>(R.id.spinner_location).adapter = this.locationAdapter
 
         //Initialize the academic level adapter and spinner
-        this.academicLevelAdapter = ArrayAdapter<DropdownOption>(activity!!, android.R.layout.simple_spinner_dropdown_item, academicLevels)
+        this.academicLevelAdapter = ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, academicLevels)
         this.listItems.findViewById<Spinner>(R.id.spinner_academicLevel).adapter = this.academicLevelAdapter
     }
 

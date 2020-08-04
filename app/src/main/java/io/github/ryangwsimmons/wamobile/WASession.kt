@@ -1,5 +1,8 @@
+@file:Suppress("BlockingMethodInNonBlockingContext")
+
 package io.github.ryangwsimmons.wamobile
 
+import android.annotation.SuppressLint
 import android.os.Parcelable
 import android.text.Html
 import android.text.Spanned
@@ -16,18 +19,18 @@ import kotlin.collections.Map
 class WASession(private val username: String, private val password: String, private var homeCookies: Map<String, String>): Parcelable {
 
     @Throws(Exception::class)
-    public suspend fun initConnection() {
+    fun initConnection() {
         //Make the initial connection to the WebAdvisor main page
         var res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TYPE=M&PID=CORE-WBMAIN&TOKENIDX=").followRedirects(true).execute()
 
         //Collect the cookies from the previous connection
-        var cookies: MutableMap<String, String> = res.cookies()
+        val cookies: MutableMap<String, String> = res.cookies()
 
         //Make the login request to the server
         res = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX="
-                + cookies.get("LASTTOKEN")
+                + cookies["LASTTOKEN"]
                 + "&SS=LGRQ&URL=https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TYPE=M%26PID=CORE-WBMAIN%26TOKENIDX="
-                + cookies.get("LASTTOKEN")
+                + cookies["LASTTOKEN"]
                 + "%26WARN=Y")
             .data("USER.NAME", this.username, "CURR.PWD", this.password, "RETURN.URL", "https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TYPE=M&PID=CORE-WBMAIN", "SUBMIT_OPTIONS", "")
             .cookies(cookies)
@@ -39,10 +42,10 @@ class WASession(private val username: String, private val password: String, priv
         cookies.putAll(res.cookies())
 
         //Parse the resulting document
-        var doc: Document = res.parse()
+        val doc: Document = res.parse()
 
         //Check that the series of connections resulted in the user getting the main page, and not the log in page or some other page
-        var docTitle: String = doc.getElementsByTag("title").text()
+        val docTitle: String = doc.getElementsByTag("title").text()
         if (!(docTitle.contains("Main Menu"))) {
             throw Exception("Unable to log into WebAdvisor. Check that your login credentials are correct.")
         }
@@ -52,25 +55,25 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    public suspend fun getName(): String {
+    fun getName(): String {
         //Check that a connection has been initialized
-        if (this.homeCookies.size == 0) {
+        if (this.homeCookies.isEmpty()) {
             throw Exception("Error: The connection has not yet been initialized.")
         }
         //Connect to the WebAdvisor main page
-        var res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TYPE=M&PID=CORE-WBMAIN&TOKENIDX=" + this.homeCookies.get("LASTTOKEN"))
+        val res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TYPE=M&PID=CORE-WBMAIN&TOKENIDX=" + this.homeCookies["LASTTOKEN"])
                                  .cookies(this.homeCookies)
                                  .followRedirects(true)
                                  .execute()
 
         //Parse the response document's HTML
-        var doc: Document = res.parse()
+        val doc: Document = res.parse()
 
         //Get the name
         var name: String = doc.getElementById("global")
-                              .getElementsByClass("container").get(0)
-                              .getElementsByTag("h1").get(0)
-                              .getElementsByClass("department").get(0)
+            .getElementsByClass("container")[0]
+            .getElementsByTag("h1")[0]
+            .getElementsByClass("department")[0]
                               .getElementsByTag("a").text()
         name = "(?<=WebAdvisor for ).*$".toRegex(RegexOption.IGNORE_CASE).find(name)!!.value
 
@@ -79,46 +82,45 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    public suspend fun getTermsResponse(): Response {
+    fun getTermsResponse(): Response {
         //Check that a connection has been initialized
-        if (this.homeCookies.size == 0) {
+        if (this.homeCookies.isEmpty()) {
             throw Exception("Error: The connection has not yet been initialized.")
         }
 
         //Connect to the WebAdvisor grades page for the signed-in user
-        var res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX="
-                + this.homeCookies.get("LASTTOKEN") + "&CONSTITUENCY=WBST&type=P&pid=ST-WESTS02A")
-            .cookies(this.homeCookies)
+
+        return Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX="
+                + homeCookies["LASTTOKEN"] + "&CONSTITUENCY=WBST&type=P&pid=ST-WESTS02A")
+            .cookies(homeCookies)
             .followRedirects(true)
             .execute()
-
-        return res
     }
 
     @Throws(Exception::class)
-    public suspend fun getTerms(): ArrayList<Term> {
+    suspend fun getTerms(): ArrayList<Term> {
         //Check that a connection has been initialized
-        if (this.homeCookies.size == 0) {
+        if (this.homeCookies.isEmpty()) {
             throw Exception("Error: The connection has not yet been initialized.")
         }
 
         //Create a new ArrayList to hold all the terms obtained from the reequest
-        var terms: ArrayList<Term> = ArrayList<Term>()
+        val terms: ArrayList<Term> = ArrayList()
 
         //Connect to the WebAdvisor grades page for the signed-in user
-        var res: Response = this.getTermsResponse()
+        val res: Response = this.getTermsResponse()
 
         //Parse the response document's HTML
-        var doc: Document = res.parse()
+        val doc: Document = res.parse()
 
         //Add all the terms to the ArrayList
         for(row: Element in doc.getElementById("GROUP_Grp_LIST_VAR1").getElementsByTag("tr")) {
             //If the current row in the table contains body cells (as opposed to header cells), add a new Term to the ArrayList
             if (row.getElementsByTag("td").size != 0) {
-                var shortName: String = row.getElementsByClass("LIST_VAR2").get(0).getElementsByTag("p").get(0).text()
-                var longName: String = row.getElementsByClass("LIST_VAR3").get(0).getElementsByTag("p").get(0).text()
-                var startDate: String = row.getElementsByClass("DATE_LIST_VAR1").get(0).getElementsByTag("p").get(0).text()
-                var endDate: String = row.getElementsByClass("DATE_LIST_VAR2").get(0).getElementsByTag("p").get(0).text()
+                val shortName: String = row.getElementsByClass("LIST_VAR2")[0].getElementsByTag("p")[0].text()
+                val longName: String = row.getElementsByClass("LIST_VAR3")[0].getElementsByTag("p")[0].text()
+                val startDate: String = row.getElementsByClass("DATE_LIST_VAR1")[0].getElementsByTag("p")[0].text()
+                val endDate: String = row.getElementsByClass("DATE_LIST_VAR2")[0].getElementsByTag("p")[0].text()
 
                 terms.add(Term(shortName, longName, startDate, endDate))
             }
@@ -129,9 +131,9 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    public suspend fun getGrades(termPosition: Int, terms: List<Term>, grades: ArrayList<Grade>, advisor: StringBuilder, termGPA: StringBuilder) {
+    suspend fun getGrades(termPosition: Int, terms: List<Term>, grades: ArrayList<Grade>, advisor: StringBuilder, termGPA: StringBuilder) {
         //Check that a connection has been initialized
-        if (this.homeCookies.size == 0) {
+        if (this.homeCookies.isEmpty()) {
             throw Exception("Error: The connection has not yet been initialized.")
         }
 
@@ -139,30 +141,30 @@ class WASession(private val username: String, private val password: String, priv
         var res: Response = this.getTermsResponse()
 
         //Create the request form for the next request using a map
-        var gradesForm: HashMap<String, String> = HashMap<String, String>()
+        val gradesForm: HashMap<String, String> = HashMap()
 
         //Construct the form
         //Add the parameters that stay the same for every request
-        gradesForm.put("LIST.VAR1_CONTROLLER", "LIST.VAR1")
-        gradesForm.put("LIST.VAR1_MEMBERS", "LIST.VAR1*LIST.VAR2*LIST.VAR3*DATE.LIST.VAR1*DATE.LIST.VAR2")
-        gradesForm.put("LIST.VAR1_MAX", terms.size.toString())
-        gradesForm.put("LIST.VAR2_MAX", terms.size.toString())
-        gradesForm.put("LIST.VAR3_MAX", terms.size.toString())
-        gradesForm.put("DATE.LIST.VAR1_MAX", terms.size.toString())
-        gradesForm.put("DATE.LIST.VAR2_MAX", terms.size.toString())
+        gradesForm["LIST.VAR1_CONTROLLER"] = "LIST.VAR1"
+        gradesForm["LIST.VAR1_MEMBERS"] = "LIST.VAR1*LIST.VAR2*LIST.VAR3*DATE.LIST.VAR1*DATE.LIST.VAR2"
+        gradesForm["LIST.VAR1_MAX"] = terms.size.toString()
+        gradesForm["LIST.VAR2_MAX"] = terms.size.toString()
+        gradesForm["LIST.VAR3_MAX"] = terms.size.toString()
+        gradesForm["DATE.LIST.VAR1_MAX"] = terms.size.toString()
+        gradesForm["DATE.LIST.VAR2_MAX"] = terms.size.toString()
         //Add the parameter that determines which term has been selected
-        gradesForm.put("LIST.VAR1_RADIO", "LIST.VAR1_" + (termPosition + 1).toString())
+        gradesForm["LIST.VAR1_RADIO"] = "LIST.VAR1_" + (termPosition + 1).toString()
         //Add the parameters that repeat for every term the signed-in user has attended at Guelph
         for (i in terms.indices) {
-            gradesForm.put("LIST.VAR2_" + (i + 1).toString(), terms[i].shortName)
-            gradesForm.put("LIST.VAR3_" + (i + 1).toString(), terms[i].longName.replace(' ', '+'))
-            gradesForm.put("DATE.LIST.VAR1_" + (i + 1).toString(), terms[i].startDate)
-            gradesForm.put("DATE.LIST.VAR2_" + (i + 1).toString(), terms[i].endDate)
+            gradesForm["LIST.VAR2_" + (i + 1).toString()] = terms[i].shortName
+            gradesForm["LIST.VAR3_" + (i + 1).toString()] = terms[i].longName.replace(' ', '+')
+            gradesForm["DATE.LIST.VAR1_" + (i + 1).toString()] = terms[i].startDate
+            gradesForm["DATE.LIST.VAR2_" + (i + 1).toString()] = terms[i].endDate
         }
         //Add the other miscellaneous parameters
-        gradesForm.put("VAR1", "")
-        gradesForm.put("RETURN.URL", "https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + this.homeCookies.get("LASTTOKEN") + "&type=M&constituency=WBST&pid=CORE-WBST")
-        gradesForm.put("SUBMIT_OPTIONS", "")
+        gradesForm["VAR1"] = ""
+        gradesForm["RETURN.URL"] = "https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + this.homeCookies["LASTTOKEN"] + "&type=M&constituency=WBST&pid=CORE-WBST"
+        gradesForm["SUBMIT_OPTIONS"] = ""
 
         //Connect to the view grades page for the selected term
         res = Jsoup.connect(res.url().toString())
@@ -173,7 +175,7 @@ class WASession(private val username: String, private val password: String, priv
             .execute()
 
         //Parse the resulting document's HTML
-        var doc: Document = res.parse()
+        val doc: Document = res.parse()
 
         //Get the advisor and the term GPA
         advisor.append(doc.getElementById("GROUP_Grp_LIST_VAR1").getElementsByTag("p")[0].text())
@@ -202,23 +204,23 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    public suspend fun getNewsItems(): List<NewsItem> {
+    fun getNewsItems(): List<NewsItem> {
         //Check that a connection has been initialized
-        if (this.homeCookies.size == 0) {
+        if (this.homeCookies.isEmpty()) {
             throw Exception("Error: The connection has not yet been initialized.")
         }
 
         //Create an ArrayList to store the news items
-        var newsItems = ArrayList<NewsItem>()
+        val newsItems = ArrayList<NewsItem>()
 
         //Make a connection to the WebAdvisor main page for students (the one with the news)
-        val res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + this.homeCookies.get("LASTTOKEN") + "&type=M&constituency=WBST&pid=CORE-WBST")
+        val res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + this.homeCookies["LASTTOKEN"] + "&type=M&constituency=WBST&pid=CORE-WBST")
             .cookies(this.homeCookies)
             .followRedirects(true)
             .execute()
 
         //Parse the resulting document's HTML
-        var doc: Document = res.parse()
+        val doc: Document = res.parse()
 
         //Loop through all the news items on the page, adding each item to the ArrayList of news items
         var studentGroup: String = ""
@@ -240,10 +242,10 @@ class WASession(private val username: String, private val password: String, priv
 
                     //Get the body of a particular news item, create new NewsItem object, and add the item to it
                     if (element.tagName() == "p") {
-                        if (android.os.Build.VERSION.SDK_INT > 23) {
-                            itemBody = Html.fromHtml(element.html(), Html.FROM_HTML_MODE_COMPACT)
+                        itemBody = if (android.os.Build.VERSION.SDK_INT > 23) {
+                            Html.fromHtml(element.html(), Html.FROM_HTML_MODE_COMPACT)
                         } else {
-                            itemBody = Html.fromHtml(element.html())
+                            Html.fromHtml(element.html())
                         }
                         newsItems.add(NewsItem(itemHeading, studentGroup, itemBody))
                     }
@@ -256,31 +258,30 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    private suspend fun getSearchSectionsResponse(): Response {
+    private fun getSearchSectionsResponse(): Response {
         //Check that a connection has been initialized
-        if (this.homeCookies.size == 0) {
+        if (this.homeCookies.isEmpty()) {
             throw Exception("Error: The connection has not yet been initialized.")
         }
 
         //Connect to the WebAdvisor search for sections filter page
-        var res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + this.homeCookies.get("LASTTOKEN") + "&CONSTITUENCY=WBST&type=P&pid=ST-WESTS12A")
-            .cookies(this.homeCookies)
-            .followRedirects(true)
-            .execute()
 
         //Return the response
-        return res
+        return Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + homeCookies["LASTTOKEN"] + "&CONSTITUENCY=WBST&type=P&pid=ST-WESTS12A")
+            .cookies(homeCookies)
+            .followRedirects(true)
+            .execute()
     }
 
     @Throws(Exception::class)
-    public suspend fun getSearchSectionsFilterValues(terms: ArrayList<DropdownOption>,
+    suspend fun getSearchSectionsFilterValues(terms: ArrayList<DropdownOption>,
                                                     subjects: ArrayList<DropdownOption>,
                                                     courseLevels: ArrayList<DropdownOption>,
                                                     times: ArrayList<DropdownOption>,
                                                     locations: ArrayList<DropdownOption>,
                                                     academicLevels: ArrayList<DropdownOption>) {
         //Check that a connection has been initialized
-        if (this.homeCookies.size == 0) {
+        if (this.homeCookies.isEmpty()) {
             throw Exception("Error: The connection has not yet been initialized.")
         }
 
@@ -363,7 +364,7 @@ class WASession(private val username: String, private val password: String, priv
         }
     }
 
-    private suspend fun formatMeeting(meetingString: String): String {
+    private fun formatMeeting(meetingString: String): String {
         //Function to format meeting strings into how they should look, given a WebAdvisor unformatted meeting string
         //Full disclosure - while all of the code written below is my own, some of the logic is derived from the same logic used to format the meetings on the actual WebAdvisor page
         //By making my formatting logic similar to the actual WebAdvisor formatting logic, I can handle any edge cases I might have otherwise missed
@@ -383,7 +384,7 @@ class WASession(private val username: String, private val password: String, priv
         }
 
         //Regular expression that checks if the meeting string is just dates
-        var regex: Regex = Regex("^(\\d{4}\\/\\d{2}\\/\\d{2})-(\\d{4}\\/\\d{2}\\/\\d{2})$")
+        var regex: Regex = Regex("^(\\d{4}/\\d{2}/\\d{2})-(\\d{4}/\\d{2}/\\d{2})$")
 
         if (regex.matches(meeting)) {
             //If just dates, put a "|" between the start and end dates
@@ -392,7 +393,7 @@ class WASession(private val username: String, private val password: String, priv
             //If not just dates, replace all duplicate values in the meeting string
             meeting = meeting.replace("Days TBA Days TBA", "Days TBA").replace("Times TBA Times TBA", "Times TBA").replace("Room TBA Room TBA", "Room TBA")
             //Use a regular expression to put "|" between all the different properties of the meeting
-            regex = Regex("^(\\d{4}\\/\\d{2}\\/\\d{2})-(\\d{4}\\/\\d{2}\\/\\d{2}) (LEC|LAB|SEM|EXAM|Distance Education|Electronic) ((Mon,? ?|Tues,? ?|Wed,? ?|Thur,? ?|Fri,? ?|Sat,? ?|Sun,? ?|Days TBA|Days to be Announced){1,7}),? ?(\\d{2}:\\d{2}[AP]M - \\d{2}:\\d{2}[AP]M|Times TBA|Times to be Announced),? ?(.*Room[^,]*)$")
+            regex = Regex("^(\\d{4}/\\d{2}/\\d{2})-(\\d{4}/\\d{2}/\\d{2}) (LEC|LAB|SEM|EXAM|Distance Education|Electronic) ((Mon,? ?|Tues,? ?|Wed,? ?|Thur,? ?|Fri,? ?|Sat,? ?|Sun,? ?|Days TBA|Days to be Announced){1,7}),? ?(\\d{2}:\\d{2}[AP]M - \\d{2}:\\d{2}[AP]M|Times TBA|Times to be Announced),? ?(.*Room[^,]*)$")
             meeting = regex.replace(meeting, "$1|$2|$3|$4|$6|$7")
         }
 
@@ -400,88 +401,88 @@ class WASession(private val username: String, private val password: String, priv
         val meetingProps: List<String> = meeting.split("|")
 
         //Get the meeting method
-        var method: String
-        if (!isDatesOnly(meetingProps)) {
-             method = meetingProps[2].trim()
+        val method: String
+        method = if (!isDatesOnly(meetingProps)) {
+            meetingProps[2].trim()
         } else {
-            method = ""
+            ""
         }
 
         //Get the meeting days, if available
-        var days: String
-        if (!isDatesOnly(meetingProps)) {
-            days = meetingProps[3].trim()
+        val days: String
+        days = if (!isDatesOnly(meetingProps)) {
+            meetingProps[3].trim()
         } else {
-            days = ""
+            ""
         }
 
         //Get the meeting time, if available
-        var time: String
-        if (!isDatesOnly(meetingProps)) {
-            time = meetingProps[4].trim()
+        val time: String
+        time = if (!isDatesOnly(meetingProps)) {
+            meetingProps[4].trim()
         } else {
-            time = ""
+            ""
         }
 
         //Get the meeting end date
         val end: String = meetingProps[1].trim()
 
         //Get the meeting building, if available
-        var building: String
-        if (!isDatesOnly(meetingProps)) {
+        val building: String
+        building = if (!isDatesOnly(meetingProps)) {
             val location = getLocation(meetingProps)
             if (location != null) {
                 val locationArray = location.split(", ")
                 if (locationArray.size > 1) {
-                    building = locationArray[0]
+                    locationArray[0]
                 } else {
-                    building = ""
+                    ""
                 }
             } else {
-                building = ""
+                ""
             }
         } else {
-            building = ""
+            ""
         }
 
         //Get the meeting room, if available
-        var room: String
-        if (!isDatesOnly(meetingProps)) {
+        val room: String
+        room = if (!isDatesOnly(meetingProps)) {
             val location = getLocation(meetingProps)
             if (location != null) {
                 val locationArray = location.split(", ")
                 if (locationArray.size > 1) {
-                    room = locationArray[1]
+                    locationArray[1]
                 } else {
-                    room = locationArray[0]
+                    locationArray[0]
                 }
             } else {
-                room = ""
+                ""
             }
         } else {
-            room = ""
+            ""
         }
 
-        if (isDatesOnly(meetingProps) == false && (method == "" || days == "" || time == "" || room == "")) {
+        if (!isDatesOnly(meetingProps) && (method == "" || days == "" || time == "" || room == "")) {
             //If the meeting is not just dates, and one of the key meeting properties is missing, return the original string
             return meetingString
-        } else if (isDatesOnly(meetingProps) == false) {
+        } else if (!isDatesOnly(meetingProps)) {
             //Otherwise, construct the formatted meeting string
-            var meetingFormatted: StringBuilder = StringBuilder()
+            val meetingFormatted: StringBuilder = StringBuilder()
 
             //Create the method and days line
-            meetingFormatted.append(method + " " + days + "\n")
+            meetingFormatted.append("$method $days\n")
 
             //If the meeting is an exam, add the exam time and date, otherwise just add the time
             if (method == "EXAM") {
-                meetingFormatted.append(time + " (" + end + ")\n")
+                meetingFormatted.append("$time ($end)\n")
             } else {
                 meetingFormatted.append(time + "\n")
             }
 
             //If the building is available, add it and the room, otherwise add just the room
             if (building != "") {
-                meetingFormatted.append(building + ", " + room)
+                meetingFormatted.append("$building, $room")
             } else {
                 meetingFormatted.append(room)
             }
@@ -496,7 +497,7 @@ class WASession(private val username: String, private val password: String, priv
 
 
     @Throws(Exception::class)
-    public suspend fun getSearchResults(term: String,
+    suspend fun getSearchResults(term: String,
                                         subjects: ArrayList<String>,
                                         courseLevels: ArrayList<String>,
                                         courseNums: ArrayList<String>,
@@ -512,37 +513,37 @@ class WASession(private val username: String, private val password: String, priv
         var res: Response = this.getSearchSectionsResponse()
 
         //Create the ArrayList to hold search results
-        var results: ArrayList<SearchResult> = ArrayList<SearchResult>()
+        val results: ArrayList<SearchResult> = ArrayList()
 
         //Create and populate a map that holds the request body
-        var searchForm: HashMap<String, String> = HashMap<String, String>()
+        val searchForm: HashMap<String, String> = HashMap()
 
-        searchForm.put("VAR1", term)
-        searchForm.put("DATE.VAR1", "")
-        searchForm.put("DATE.VAR2", "")
-        searchForm.put("LIST.VAR1_CONTROLLER", "LIST.VAR1")
-        searchForm.put("LIST.VAR1_MEMBERS", "LIST.VAR1*LIST.VAR2*LIST.VAR3*LIST.VAR4")
-        searchForm.put("LIST.VAR1_MAX", "5")
-        searchForm.put("LIST.VAR2_MAX", "5")
-        searchForm.put("LIST.VAR3_MAX", "5")
-        searchForm.put("LIST.VAR4_MAX", "5")
+        searchForm["VAR1"] = term
+        searchForm["DATE.VAR1"] = ""
+        searchForm["DATE.VAR2"] = ""
+        searchForm["LIST.VAR1_CONTROLLER"] = "LIST.VAR1"
+        searchForm["LIST.VAR1_MEMBERS"] = "LIST.VAR1*LIST.VAR2*LIST.VAR3*LIST.VAR4"
+        searchForm["LIST.VAR1_MAX"] = "5"
+        searchForm["LIST.VAR2_MAX"] = "5"
+        searchForm["LIST.VAR3_MAX"] = "5"
+        searchForm["LIST.VAR4_MAX"] = "5"
         subjects.forEachIndexed {index, subject ->
-            searchForm.put("LIST.VAR1_" + (index + 1).toString(), subject)
-            searchForm.put("LIST.VAR2_" + (index + 1).toString(), courseLevels[index])
-            searchForm.put("LIST.VAR3_" + (index + 1).toString(), courseNums[index])
-            searchForm.put("LIST.VAR4_" + (index + 1).toString(), sections[index])
+            searchForm["LIST.VAR1_" + (index + 1).toString()] = subject
+            searchForm["LIST.VAR2_" + (index + 1).toString()] = courseLevels[index]
+            searchForm["LIST.VAR3_" + (index + 1).toString()] = courseNums[index]
+            searchForm["LIST.VAR4_" + (index + 1).toString()] = sections[index]
         }
-        searchForm.put("VAR7", times[0])
-        searchForm.put("VAR8", times[1])
+        searchForm["VAR7"] = times[0]
+        searchForm["VAR8"] = times[1]
         days.forEachIndexed {index, day ->
-            searchForm.put("VAR" + (10 + index).toString(), if (day == true) "Y" else "")
+            searchForm["VAR" + (10 + index).toString()] = if (day) "Y" else ""
         }
-        searchForm.put("VAR3", courseKeywords)
-        searchForm.put("VAR6", location)
-        searchForm.put("VAR21", academicLevel)
-        searchForm.put("VAR9", instructorsLastName)
-        searchForm.put("RETURN.URL", "https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + this.homeCookies.get("LASTTOKEN") + "&type=M&constituency=WBST&pid=CORE-WBST")
-        searchForm.put("SUBMIT_OPTIONS", "")
+        searchForm["VAR3"] = courseKeywords
+        searchForm["VAR6"] = location
+        searchForm["VAR21"] = academicLevel
+        searchForm["VAR9"] = instructorsLastName
+        searchForm["RETURN.URL"] = "https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + this.homeCookies["LASTTOKEN"] + "&type=M&constituency=WBST&pid=CORE-WBST"
+        searchForm["SUBMIT_OPTIONS"] = ""
 
         //Make the connection to the server to get the search results page
         res = Jsoup.connect(res.url().toString())
@@ -566,10 +567,10 @@ class WASession(private val username: String, private val password: String, priv
                 val title: String = result.getElementsByClass("SEC_SHORT_TITLE")[0].getElementsByTag("a")[0].text()
                 val location: String = result.getElementsByClass("SEC_LOCATION")[0].getElementsByTag("p")[0].text()
 
-                var meetings: ArrayList<String> = ArrayList<String>()
+                val meetings: ArrayList<String> = ArrayList()
                 var unformattedMeetingsString: String = result.getElementsByClass("SEC_MEETING_INFO")[0].getElementsByTag("p")[0].text()
-                val regex: Regex = Regex("( |\\n)(\\d{4}\\/\\d{2}\\/\\d{2}|\\/  \\/  )")
-                unformattedMeetingsString = regex.replace(unformattedMeetingsString, {match -> "^" + match.groupValues[2]})
+                val regex: Regex = Regex("([ \\n])(\\d{4}/\\d{2}/\\d{2}|/  / {2}  )")
+                unformattedMeetingsString = regex.replace(unformattedMeetingsString) { match -> "^" + match.groupValues[2]}
                 val unformattedMeetings = unformattedMeetingsString.split("^")
                 unformattedMeetings.forEachIndexed { index, unformattedMeeting ->
                     if (index < unformattedMeetings.size - 1) {
@@ -595,7 +596,8 @@ class WASession(private val username: String, private val password: String, priv
         return results
     }
 
-    public suspend fun getSectionDetails(cookies: Map<String, String>, result: SearchResult): SectionDetails {
+    @SuppressLint("DefaultLocale")
+    fun getSectionDetails(cookies: Map<String, String>, result: SearchResult): SectionDetails {
         //Make the connection to the server
         var res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor" + result.detailsURL)
             .cookies(cookies)
@@ -620,7 +622,7 @@ class WASession(private val username: String, private val password: String, priv
         }
 
         //Connect to the calendar page
-        res = Jsoup.connect(calendarURL + courseName + ".shtml")
+        res = Jsoup.connect("$calendarURL$courseName.shtml")
             .followRedirects(true)
             .execute()
 

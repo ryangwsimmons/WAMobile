@@ -2,23 +2,23 @@ package io.github.ryangwsimmons.wamobile
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.Parcel
-import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.ArrayAdapter
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
+import androidx.fragment.app.Fragment
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.fragment_grades.*
-import kotlinx.coroutines.*
+import kotlinx.coroutines.CoroutineExceptionHandler
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 
 class GradesFragment(private var session: WASession, private var actionBar: ActionBar) : Fragment(), TermsAdapter.OnTermClickListener {
 
-    lateinit var terms: ArrayList<Term>
+    private lateinit var terms: ArrayList<Term>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -31,10 +31,10 @@ class GradesFragment(private var session: WASession, private var actionBar: Acti
         val listItems: View = inflater.inflate(R.layout.fragment_grades, container, false)
 
         //Get the recycler view from the fragment
-        var recyclerViewTerms: RecyclerView = listItems.findViewById<RecyclerView>(R.id.recyclerView_terms)
+        val recyclerViewTerms: RecyclerView = listItems.findViewById(R.id.recyclerView_terms)
 
         //Set the adapter, layout manager, and other settings for the recycler view for the terms
-        var adapter: TermsAdapter = TermsAdapter(ArrayList<Term>(), this, activity!!.applicationContext)
+        val adapter: TermsAdapter = TermsAdapter(ArrayList(), this, activity!!.applicationContext)
         recyclerViewTerms.adapter = adapter
         recyclerViewTerms.layoutManager = LinearLayoutManager(activity!!.applicationContext)
 
@@ -67,7 +67,7 @@ class GradesFragment(private var session: WASession, private var actionBar: Acti
         //Create an intent to change activity
         val intent = Intent(activity!!.applicationContext, GradeViewActivity::class.java).apply {
             //Set up the parcel for passing data to the activity
-            var bundle: Bundle = Bundle()
+            val bundle: Bundle = Bundle()
             bundle.putParcelable("session", this@GradesFragment.session)
             bundle.putParcelableArrayList("terms", this@GradesFragment.terms)
             bundle.putInt("position", position)

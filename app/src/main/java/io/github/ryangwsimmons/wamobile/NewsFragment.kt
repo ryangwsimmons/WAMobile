@@ -11,9 +11,9 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.*
 
-class NewsFragment(private var session: WASession, var actionBar: ActionBar) : Fragment() {
+class NewsFragment(private var session: WASession, private var actionBar: ActionBar) : Fragment() {
 
-    lateinit var newsItems: List<NewsItem>
+    private lateinit var newsItems: List<NewsItem>
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -26,10 +26,10 @@ class NewsFragment(private var session: WASession, var actionBar: ActionBar) : F
         val listItems: View = inflater.inflate(R.layout.fragment_news, container, false)
 
         //Get the recycler view from the fragment
-        var recyclerViewNewsItems: RecyclerView = listItems.findViewById<RecyclerView>(R.id.recyclerView_news)
+        val recyclerViewNewsItems: RecyclerView = listItems.findViewById(R.id.recyclerView_news)
 
         //Set the adapter, layout manager, and other settings for the recycler view for the news items
-        var adapter: NewsAdapter = NewsAdapter(ArrayList<NewsItem>(), activity!!)
+        val adapter: NewsAdapter = NewsAdapter(ArrayList(), activity!!)
         recyclerViewNewsItems.adapter = adapter
         recyclerViewNewsItems.layoutManager = LinearLayoutManager(activity!!.applicationContext)
 

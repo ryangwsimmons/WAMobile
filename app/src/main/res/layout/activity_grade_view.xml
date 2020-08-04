@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
@@ -46,7 +45,7 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/textView_advisorName"
                         android:textSize="16sp"
-                        android:layout_toRightOf="@id/textView_advisorHeading"
+                        android:layout_toEndOf="@id/textView_advisorHeading"
                         android:text="None" />
 
                     <TextView
@@ -55,7 +54,7 @@
                         android:id="@+id/textView_termGPAHeading"
                         android:textSize="16sp"
                         android:textStyle="bold"
-                        android:layout_toLeftOf="@id/textView_TermGPAValue"
+                        android:layout_toStartOf="@id/textView_TermGPAValue"
                         android:text="Term GPA: " />
 
                     <TextView
@@ -63,7 +62,7 @@
                         android:layout_height="wrap_content"
                         android:id="@+id/textView_TermGPAValue"
                         android:textSize="16sp"
-                        android:layout_alignParentRight="true"
+                        android:layout_alignParentEnd="true"
                         android:text="100.00%" />
 
                 </RelativeLayout>

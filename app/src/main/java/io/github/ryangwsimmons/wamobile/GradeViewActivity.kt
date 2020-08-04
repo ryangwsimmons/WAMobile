@@ -32,7 +32,7 @@ class GradeViewActivity : AppCompatActivity() {
         val bundle = intent.getBundleExtra("bundle")!!
 
         //Get the session from the bundle
-        this.session = bundle.getParcelable<WASession>("session")!!
+        this.session = bundle.getParcelable("session")!!
 
         //Get the terms from the bundle
         this.terms = bundle.getParcelableArrayList<Term>("terms")!!
@@ -49,16 +49,16 @@ class GradeViewActivity : AppCompatActivity() {
         this.actionbar.setDisplayHomeAsUpEnabled(true)
 
         //Set the title of the activity
-        this.actionbar.title = "Grades for " + this.terms.get(this.position).longName
+        this.actionbar.title = "Grades for " + this.terms[this.position].longName
 
         //Set up the recycler view settings
-        var adapter: GradeViewAdapter = GradeViewAdapter(ArrayList<Grade>())
+        val adapter: GradeViewAdapter = GradeViewAdapter(ArrayList())
         recyclerView_grades.adapter = adapter
         recyclerView_grades.layoutManager = LinearLayoutManager(this)
 
         //Create an error handler for the coroutine that will be executed to get the grades
         val errorHandler = CoroutineExceptionHandler { _, error ->
-            CoroutineScope(Dispatchers.Main).launch {
+            CoroutineScope(Main).launch {
                 Toast.makeText(this@GradeViewActivity, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 if (error.message != null) {
                     Toast.makeText(this@GradeViewActivity, getString(R.string.network_error), Toast.LENGTH_LONG).show()
@@ -69,10 +69,10 @@ class GradeViewActivity : AppCompatActivity() {
         //Launch a coroutine to get the grades for the signed-in user for the selected term
         CoroutineScope(errorHandler).launch {
             //Instantiate a new ArrayList to hold grades
-            this@GradeViewActivity.grades = ArrayList<Grade>()
+            this@GradeViewActivity.grades = ArrayList()
             //Create StringBuilders for advisor and term GPA
-            var advisor: StringBuilder = StringBuilder()
-            var termGPA: StringBuilder = StringBuilder()
+            val advisor: StringBuilder = StringBuilder()
+            val termGPA: StringBuilder = StringBuilder()
             //Get a list with the grades
             this@GradeViewActivity.session.getGrades(this@GradeViewActivity.position,
                 this@GradeViewActivity.terms,
@@ -91,7 +91,7 @@ class GradeViewActivity : AppCompatActivity() {
         }
     }
 
-    public override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> {
                 this.finish()

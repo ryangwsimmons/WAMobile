@@ -8,17 +8,16 @@ import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.recycleritem_term.view.*
 
-class TermsAdapter(private var terms: List<Term>, private val listener: OnTermClickListener, private val context: Context): RecyclerView.Adapter<TermsAdapter.TermViewwHolder>() {
+class TermsAdapter(private var terms: List<Term>, private val listener: OnTermClickListener, private val context: Context): RecyclerView.Adapter<TermsAdapter.TermViewHolder>() {
 
-    var inflater: LayoutInflater
+    private var inflater: LayoutInflater = LayoutInflater.from(this.context)
 
     init {
-        //Create an inflator using the context passed in from the fragment
-        this.inflater = LayoutInflater.from(this.context)
+        //Create an inflater using the context passed in from the fragment
     }
 
     //Create a view holder to hold the data for each term
-    inner class TermViewwHolder(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener {
+    inner class TermViewHolder(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener {
         val longName: TextView = itemView.textView_term_longName
         val shortName: TextView = itemView.textView_term_shortName
         val startDate: TextView = itemView.textView_term_startDate
@@ -44,15 +43,15 @@ class TermsAdapter(private var terms: List<Term>, private val listener: OnTermCl
     }
 
     //Create a new view holder, and associate it with the CardView for a term
-    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TermViewwHolder {
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): TermViewHolder {
         //Inflate view holders using the activity context passed in
         val itemView = this.inflater.inflate(R.layout.recycleritem_term, parent, false)
 
-        return TermViewwHolder(itemView)
+        return TermViewHolder(itemView)
     }
 
     //Assign the values in the view holder to the values from the terms list
-    override fun onBindViewHolder(holder: TermViewwHolder, position: Int) {
+    override fun onBindViewHolder(holder: TermViewHolder, position: Int) {
         val currentTerm = this.terms[position]
 
         holder.longName.text = currentTerm.longName

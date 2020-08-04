@@ -1,14 +1,13 @@
 package io.github.ryangwsimmons.wamobile
 
 import android.content.Intent
-import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.view.View
 import android.widget.Toast
+import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers.IO
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -22,8 +21,8 @@ class MainActivity : AppCompatActivity() {
         button_login.setOnClickListener(fun (v: View) {
 
             //Get the username and password the user entered
-            var username: String = editText_username.text.toString()
-            var password: String = editText_password.text.toString()
+            val username: String = editText_username.text.toString()
+            val password: String = editText_password.text.toString()
 
             //Make sure that a username and password have been entered
             if (username == "" || password == "") {
@@ -32,7 +31,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             //Create a new WebAdvisor session
-            val session: WASession = WASession(username, password, HashMap<String, String>())
+            val session: WASession = WASession(username, password, HashMap())
 
             //Handle any errors that occur in the coroutine
             val errorHandler = CoroutineExceptionHandler { _, error ->
@@ -53,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                     //Create an intent to change activity
                     val intent = Intent(this@MainActivity, BaseActivity::class.java).apply {
                         //Set up the parcel for passing data to the activity
-                        var bundle: Bundle = Bundle()
+                        val bundle: Bundle = Bundle()
                         bundle.putParcelable("session", session)
                         putExtra("bundle", bundle)
                     }

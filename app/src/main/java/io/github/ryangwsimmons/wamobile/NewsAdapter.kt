@@ -1,9 +1,7 @@
 package io.github.ryangwsimmons.wamobile
 
 import android.content.Context
-import android.text.Html
 import android.text.method.LinkMovementMethod
-import android.text.util.Linkify
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -12,11 +10,10 @@ import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.recycleritem_news.view.*
 
 class NewsAdapter(private var newsItems: List<NewsItem>, private val context: Context): RecyclerView.Adapter<NewsAdapter.NewsItemViewHolder>() {
-    var inflater: LayoutInflater
+    private var inflater: LayoutInflater = LayoutInflater.from(this.context)
 
     init {
-        //Create an inflator using the context passed in from the fragment
-        this.inflater = LayoutInflater.from(this.context)
+        //Create an inflater using the context passed in from the fragment
     }
 
     //Create a view holder to hold the data for each news item

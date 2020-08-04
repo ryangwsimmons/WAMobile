@@ -1,6 +1,5 @@
 package io.github.ryangwsimmons.wamobile
 
-import android.graphics.Color
 import android.text.SpannedString
 import android.view.LayoutInflater
 import android.view.View
@@ -9,7 +8,6 @@ import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.android.synthetic.main.recycleritem_section.view.*
-import kotlin.text.StringBuilder
 
 class SearchResultsAdapter(private var results: List<SearchResult>, private val listener: OnSectionClickListener): RecyclerView.Adapter<SearchResultsAdapter.SectionHolder>() {
 
@@ -63,7 +61,7 @@ class SearchResultsAdapter(private var results: List<SearchResult>, private val 
         holder.available.text = currentResult.available
         holder.credits.text = currentResult.credits
         holder.academicLevel.text = currentResult.academicLevel
-        var finalMeetingsString: StringBuilder = StringBuilder()
+        val finalMeetingsString: StringBuilder = StringBuilder()
         currentResult.meetings.forEach {meeting ->
             finalMeetingsString.append(meeting)
         }

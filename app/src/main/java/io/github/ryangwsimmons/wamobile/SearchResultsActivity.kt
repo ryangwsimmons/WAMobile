@@ -29,7 +29,7 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
         val bundle: Bundle = intent.getBundleExtra("bundle")!!
 
         //Get the session from the previous activity
-        this.session = bundle.getParcelable<WASession>("session")!!
+        this.session = bundle.getParcelable("session")!!
 
         //Get the data from the previous activity from the bundle
         val term: String = bundle.getString("term")!!
@@ -38,7 +38,7 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
         val courseNums: ArrayList<String> = bundle.getStringArrayList("courseNums")!!
         val sections: ArrayList<String> = bundle.getStringArrayList("sections")!!
         val times: ArrayList<String> = bundle.getStringArrayList("times")!!
-        val days: ArrayList<Boolean> = ArrayList<Boolean>(bundle.getBooleanArray("days")!!.toList())
+        val days: ArrayList<Boolean> = ArrayList(bundle.getBooleanArray("days")!!.toList())
         val courseKeywords: String = bundle.getString("courseKeywords")!!
         val location: String = bundle.getString("location")!!
         val academicLevel: String = bundle.getString("academicLevel")!!
@@ -56,7 +56,7 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
         this.actionbar.title = getString(R.string.searchResults_title)
 
         //Set up the recycler view settings
-        var adapter: SearchResultsAdapter = SearchResultsAdapter(ArrayList<SearchResult>(), this)
+        val adapter: SearchResultsAdapter = SearchResultsAdapter(ArrayList(), this)
         recyclerView_sections.adapter = adapter
         recyclerView_sections.layoutManager = LinearLayoutManager(this)
 
@@ -73,7 +73,7 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
         //Launch a coroutine to get the search results
         CoroutineScope(errorHandler).launch {
             //Get the list of search results
-            this@SearchResultsActivity.cookies = HashMap<String, String>()
+            this@SearchResultsActivity.cookies = HashMap()
             this@SearchResultsActivity.results = this@SearchResultsActivity.session.getSearchResults(term,
                 subjects,
                 courseLevels,
@@ -99,7 +99,7 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
         //Create an intent to change activity
         val intent = Intent(this, SectionDetailsActivity::class.java).apply {
             //Set up bundle for passing data into the next activity
-            var bundle: Bundle = Bundle()
+            val bundle: Bundle = Bundle()
             bundle.putParcelable("session", this@SearchResultsActivity.session)
             bundle.putParcelable("result", this@SearchResultsActivity.results[position])
             putExtra("bundle", bundle)
@@ -110,7 +110,7 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
         startActivity(intent)
     }
 
-    public override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> {
                 this.finish()

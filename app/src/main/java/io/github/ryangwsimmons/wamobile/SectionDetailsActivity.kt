@@ -41,8 +41,8 @@ class SectionDetailsActivity : AppCompatActivity() {
         //Get data from previous activity
         val bundle: Bundle = intent.getBundleExtra("bundle")!!
 
-        val session: WASession = bundle.getParcelable<WASession>("session")!!
-        val result: SearchResult = bundle.getParcelable<SearchResult>("result")!!
+        val session: WASession = bundle.getParcelable("session")!!
+        val result: SearchResult = bundle.getParcelable("result")!!
         val cookies: HashMap<String, String> = intent.extras!!.getSerializable("cookies") as HashMap<String, String>
 
         //Create an error handler for the coroutine that will be executed to get the section details
@@ -95,7 +95,7 @@ class SectionDetailsActivity : AppCompatActivity() {
                         override fun onClick(view: View) {
                             //When an email is clicked on, create an intent that opens an email client
                             val intent: Intent = Intent(Intent.ACTION_VIEW).apply {
-                                setData(Uri.parse("mailto:?to=" + details.facultyEmail))
+                                data = Uri.parse("mailto:?to=" + details.facultyEmail)
                             }
 
                             //Start a new activity, allowing the user to send an email using any of the clients they've installed
@@ -123,7 +123,7 @@ class SectionDetailsActivity : AppCompatActivity() {
                             //When a phone number is clicked on, create an intent that opens the dialer
                             val intent: Intent = Intent(Intent.ACTION_DIAL).apply {
                                 //Remove all characters except the numbers from the phone number
-                                setData(Uri.parse("tel:" + details.facultyPhone.replace("(", "").replace(")", "").replace("-", "").replace(" ", "")))
+                                data = Uri.parse("tel:" + details.facultyPhone.replace("(", "").replace(")", "").replace("-", "").replace(" ", ""))
                             }
 
                             //Start a new activity, allowing the user to call the number using their dialer
@@ -150,7 +150,7 @@ class SectionDetailsActivity : AppCompatActivity() {
         }
     }
 
-    public override fun onOptionsItemSelected(item: MenuItem): Boolean {
+    override fun onOptionsItemSelected(item: MenuItem): Boolean {
         when(item.itemId) {
             android.R.id.home -> {
                 this.finish()

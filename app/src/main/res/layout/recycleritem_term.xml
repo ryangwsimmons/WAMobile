@@ -32,7 +32,7 @@
             android:layout_height="wrap_content"
             android:id="@+id/textView_term_startDate"
             android:textSize="13sp"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_alignBaseline="@id/textView_term_longName"
             android:text="Start Date: 01/01/1970" />
 
@@ -42,7 +42,7 @@
             android:id="@+id/textView_term_endDate"
             android:textSize="13sp"
             android:layout_below="@id/textView_term_startDate"
-            android:layout_alignParentRight="true"
+            android:layout_alignParentEnd="true"
             android:layout_alignBaseline="@id/textView_term_shortName"
             android:text="End Date: 01/01/1970" />
 

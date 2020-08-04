@@ -5,27 +5,27 @@
 
         <item
             android:id="@+id/menuItem_news"
-            android:title="News" />
+            android:title="@string/menuItem_news" />
 
-        <item android:title="Registration">
+        <item android:title="@string/menuItem_registration">
             <menu>
                 <group android:checkableBehavior="single">
 
                     <item
                         android:id="@+id/menuItem_searchSections"
-                        android:title="Search for Sections" />
+                        android:title="@string/menuItem_searchSections" />
 
                 </group>
             </menu>
         </item>
 
-        <item android:title="Academic Profile">
+        <item android:title="@string/menuItem_academicProfile">
             <menu>
                 <group android:checkableBehavior="single">
 
                     <item
                         android:id="@+id/menuItem_grades"
-                        android:title="Grades" />
+                        android:title="@string/menuItem_grades" />
 
                 </group>
             </menu>
