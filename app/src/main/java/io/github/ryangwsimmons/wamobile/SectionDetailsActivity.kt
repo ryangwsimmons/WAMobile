@@ -94,9 +94,9 @@ class SectionDetailsActivity : AppCompatActivity() {
                     val emailClick: ClickableSpan = object: ClickableSpan() {
                         override fun onClick(view: View) {
                             //When an email is clicked on, create an intent that opens an email client
-                            val intent: Intent = Intent(Intent.ACTION_VIEW).apply {
-                                data = Uri.parse("mailto:?to=" + details.facultyEmail)
-                            }
+                            val intent: Intent = Intent(Intent.ACTION_VIEW).apply({
+                                data = Uri.parse("mailto:?to=" + Uri.encode(details.facultyEmail))
+                            })
 
                             //Start a new activity, allowing the user to send an email using any of the clients they've installed
                             try {
@@ -123,7 +123,7 @@ class SectionDetailsActivity : AppCompatActivity() {
                             //When a phone number is clicked on, create an intent that opens the dialer
                             val intent: Intent = Intent(Intent.ACTION_DIAL).apply {
                                 //Remove all characters except the numbers from the phone number
-                                data = Uri.parse("tel:" + details.facultyPhone.replace("(", "").replace(")", "").replace("-", "").replace(" ", ""))
+                                data = Uri.parse("tel:" + Uri.encode(details.facultyPhone))
                             }
 
                             //Start a new activity, allowing the user to call the number using their dialer
