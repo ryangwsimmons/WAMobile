@@ -6,6 +6,8 @@ import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
 import android.view.MenuItem
+import android.widget.FrameLayout
+import android.widget.ProgressBar
 import android.widget.Toast
 import androidx.appcompat.app.ActionBar
 import androidx.appcompat.app.AppCompatActivity
@@ -31,6 +33,8 @@ class BaseActivity : AppCompatActivity() {
     private lateinit var fragmentManager: FragmentManager
     private lateinit var navigationView: NavigationView
     private lateinit var navListener: NavMenuItemListener
+    private lateinit var progressBar: ProgressBar
+    private lateinit var fragmentContainer: FrameLayout
     private var doubleBacktoExitPressedOnce: Boolean = false
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -45,6 +49,10 @@ class BaseActivity : AppCompatActivity() {
         this.toolbar = toolBar
         setSupportActionBar(toolbar)
 
+        //Get other layout items
+        this.progressBar = progress_bar
+        this.fragmentContainer = fragment_container
+
         //Set properties for the ActionBar in the activity
         this.actionBar = supportActionBar!!
         actionBar.setDisplayHomeAsUpEnabled(true)
@@ -53,14 +61,14 @@ class BaseActivity : AppCompatActivity() {
         //Define the DrawerLayout, FragmentManager, NavMenuItemListener, and NavigationView for the activity
         this.drawerLayout = drawer_layout
         this.fragmentManager = supportFragmentManager
-        this.navListener = NavMenuItemListener(session, this.fragmentManager, this.drawerLayout, actionBar)
+        this.navListener = NavMenuItemListener(session, this.fragmentManager, this.drawerLayout, actionBar, this.progressBar, this.fragmentContainer)
         this.navigationView = navigation_view
 
         //Set the listeners for the NavigationView
         this.navigationView.setNavigationItemSelectedListener(this.navListener)
 
         //Set the default selection for the navigation drawer to "News"
-        this.navListener.onNavigationItemSelected(navigationView.menu.getItem(0))
+        this.navListener.fragmentSwitchAction(this.navigationView.menu.getItem(0))
 
         //Handle errors in the coroutine that is launched after this
         val errorHandler = CoroutineExceptionHandler {_, error ->

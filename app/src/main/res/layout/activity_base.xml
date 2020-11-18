@@ -16,12 +16,33 @@
 
         <include layout="@layout/toolbar_layout" />
 
-        <fragment
+        <FrameLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:id="@+id/fragmentHolder"
-            android:name="io.github.ryangwsimmons.wamobile.BaseFragment"
-            tools:layout="@layout/fragment_base" />
+            android:layout_height="match_parent">
+
+            <FrameLayout
+                android:id="@+id/fragment_container"
+                android:layout_width="match_parent"
+                android:layout_height="match_parent"
+                android:visibility="gone">
+
+                <fragment
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/fragmentHolder"
+                    android:name="io.github.ryangwsimmons.wamobile.BaseFragment"
+                    tools:layout="@layout/fragment_base" />
+
+            </FrameLayout>
+
+            <ProgressBar
+                android:id="@+id/progress_bar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:visibility="gone" />
+
+        </FrameLayout>
 
     </LinearLayout>
 
