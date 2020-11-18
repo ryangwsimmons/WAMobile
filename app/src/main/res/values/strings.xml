@@ -13,15 +13,15 @@
     <string name="menuItem_grades">Grades</string>
 
     <string name="network_error">A network error has occurred. Please check your internet connection and try again.</string>
-    <string name="signedIn_message">Signed into WebAdvisor as </string>
+    <string name="signedIn_message">Signed into WebAdvisor as&#160;</string>
     <string name="exit_message">Press back again to exit</string>
 
     <string name="termSelect_message">Select Term</string>
-    <string name="termSelect_startDate">Start Date: </string>
-    <string name="termSelect_endDate">End Date: </string>
+    <string name="termSelect_startDate">Start Date:&#160;</string>
+    <string name="termSelect_endDate">End Date:&#160;</string>
 
-    <string name="finalGrade_label">Final Grade: </string>
-    <string name="credits_label">Credits: </string>
+    <string name="finalGrade_label">Final Grade:&#160;</string>
+    <string name="credits_label">Credits:&#160;</string>
 
     <string name="news_title">News</string>
 
