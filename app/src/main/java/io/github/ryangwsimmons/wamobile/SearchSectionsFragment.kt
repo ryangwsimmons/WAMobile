@@ -86,7 +86,9 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
 
         //Set up a listener for the "submit" button
         listItems.findViewById<Button>(R.id.button_submitSearch).setOnClickListener { v: View ->
-            if (this.countFilledFields() < 2) {
+            if ((listItems.findViewById<Spinner>(R.id.spinner_terms).selectedItem as DropdownOption).value == "") {
+                Toast.makeText(activity!!.applicationContext, getString(R.string.sfs_no_term_selected), Toast.LENGTH_SHORT).show()
+            } else if (this.countFilledFields() < 2) {
                 Toast.makeText(activity!!.applicationContext, getString(R.string.sfs_not_enough_fields), Toast.LENGTH_SHORT).show()
             } else {
                 //Create an intent to start the search results activity
