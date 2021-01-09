@@ -21,6 +21,9 @@ class NavMenuItemListener(private val session: WASession,
                           private var progressBar: ProgressBar,
                           private var fragmentContainer: FrameLayout): NavigationView.OnNavigationItemSelectedListener {
 
+    //The following two functions were heavily influenced by the following Stack Overflow answer: https://stackoverflow.com/a/47841218,
+    //which is licensed under CC BY-SA 3.0 (https://creativecommons.org/licenses/by-sa/3.0/).
+    //Several modifications were made to the code from this answer, however.
     override fun onNavigationItemSelected(item: MenuItem): Boolean {
         //Show progress bar and hide fragment container
         crossFade(progressBar, fragmentContainer, false)
