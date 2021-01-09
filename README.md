@@ -3,13 +3,12 @@ An Android app to access the University of Guelph's WebAdvisor service.
 
 ## Screenshots
 
-![The app's login screen](screenshots/login.png?raw=true)
-
-![The app's news screen](screenshots/news.png?raw=true)
-
-![The app's search for sections results screen](screenshots/search-for-sections.png?raw=true)
-
-![The app's grades screen](screenshots/grades.png?raw=true)
+<p float="left">
+  <img src="screenshots/login.png?raw=true" width="225" />
+  <img src="screenshots/news.png?raw=true" width="225" />
+  <img src="screenshots/search-for-sections.png?raw=true" width="225" />
+  <img src="screenshots/grades.png?raw=true" width="225" />
+</p>
 
 ## Installation
 1. Download the lateset APK file from the [releases page](https://github.com/ryangwsimmons/WAMobile/releases) to your android device
