@@ -20,4 +20,5 @@ An Android app to access the University of Guelph's WebAdvisor service.
 
 ## To-Do
 - Make more WebAdvisor features available in the app (schedules, financial account, etc.)
+- Handle WebAdvisor login time-outs
 - Add app to the Play Store
