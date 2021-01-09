@@ -22,3 +22,6 @@ An Android app to access the University of Guelph's WebAdvisor service.
 - Make more WebAdvisor features available in the app (schedules, financial account, etc.)
 - Handle WebAdvisor login time-outs
 - Add app to the Play Store
+
+## A Warning
+This app is unofficial. The developer of WAMobile (me) is not associated with the University of Guelph in any way, apart from being a student. By entering your single sign-on credentials into third-party apps, you potentially put yourself at risk for phishing attacks. This app is entirely open source, and makes no external network calls, except for those necessary to access WebAdvisor itself. All data processing is done on-device. I believe it to be completely safe, but this is a risk you take on if you choose to use it, or any other third-party applications.
