@@ -4,10 +4,10 @@ An Android app to access the University of Guelph's WebAdvisor service.
 ## Screenshots
 
 <p float="left">
-  <img src="screenshots/login.png?raw=true" width="225" />
-  <img src="screenshots/news.png?raw=true" width="225" />
-  <img src="screenshots/search-for-sections.png?raw=true" width="225" />
-  <img src="screenshots/grades.png?raw=true" width="225" />
+  <img src="screenshots/login.png?raw=true" width="200" />
+  <img src="screenshots/news.png?raw=true" width="200" />
+  <img src="screenshots/search-for-sections.png?raw=true" width="200" />
+  <img src="screenshots/grades.png?raw=true" width="200" />
 </p>
 
 ## Installation
