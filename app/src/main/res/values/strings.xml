@@ -1,4 +1,10 @@
 <resources>
+    <string name="init_warning_title">Warning</string>
+    <string name="init_warning_body"><![CDATA[This app is unofficial. The developer of WAMobile is not associated with the University of Guelph in any way,
+                                        apart from being a student. By entering your single sign-on credentials into third-party apps, you potentially put
+                                        yourself at risk for phishing attacks. If you wish to verify the safety of this app yourself, you can
+                                        <a href="https://github.com/ryangwsimmons/WAMobile">view the source code on GitHub.</a>]]></string>
+
     <string name="app_name">WAMobile</string>
     <string name="welcome_text">Welcome.\nTo start, please log in with your University of Guelph Central Login ID.</string>
     <string name="username_hint">Username</string>

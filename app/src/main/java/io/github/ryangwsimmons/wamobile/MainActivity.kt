@@ -1,9 +1,15 @@
 package io.github.ryangwsimmons.wamobile
 
+import android.content.DialogInterface
 import android.content.Intent
+import android.content.SharedPreferences
 import android.os.Bundle
+import android.text.Html
+import android.text.method.LinkMovementMethod
 import android.view.View
+import android.widget.TextView
 import android.widget.Toast
+import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_main.*
 import kotlinx.coroutines.CoroutineExceptionHandler
@@ -16,6 +22,13 @@ class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_main)
+
+        //Show the initial dialog that appears when the app is started for the first time
+        val prefs: SharedPreferences = getSharedPreferences("prefs", MODE_PRIVATE)
+        val firstStart: Boolean = prefs.getBoolean("firstStart", true)
+        if (firstStart) {
+            showInitialDialog()
+        }
 
         //Set the action for when the "Login" button is tapped
         button_login.setOnClickListener(fun (v: View) {
@@ -63,5 +76,24 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         })
+    }
+
+    private fun showInitialDialog() {
+        //Show the dialog
+        var dialog: AlertDialog = AlertDialog.Builder(this)
+            .setTitle(getString(R.string.init_warning_title))
+            .setMessage(Html.fromHtml(getString(R.string.init_warning_body), Html.TO_HTML_PARAGRAPH_LINES_INDIVIDUAL))
+            .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
+            .create()
+
+        dialog.show()
+
+        dialog.findViewById<TextView>(android.R.id.message)!!.movementMethod = LinkMovementMethod.getInstance()
+
+        //Update the shared preferences so that the dialog doesn't appear again
+        var prefs: SharedPreferences = getSharedPreferences("prefs", MODE_PRIVATE)
+        var editor: SharedPreferences.Editor = prefs.edit()
+        editor.putBoolean("firstStart", false)
+        editor.apply()
     }
 }
