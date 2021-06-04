@@ -17,6 +17,8 @@
     <string name="menuItem_searchSections">Search for Sections</string>
     <string name="menuItem_academicProfile">Academic Profile</string>
     <string name="menuItem_grades">Grades</string>
+    <string name="menuItem_financialProfile">Financial Profile</string>
+    <string name="menuItem_accountView">Account View</string>
 
     <string name="network_error">A network error has occurred. Please check your internet connection and try again.</string>
     <string name="signedIn_message">Signed into WebAdvisor as&#160;</string>
@@ -80,6 +82,8 @@
     <string name="secdet_send_email_prompt">Send Email Using…</string>
     <string name="secdet_email_unable">Unable to send email, do you have an email app installed?</string>
     <string name="secdet_phone_unable">Unable to open dialer, is this a phone?</string>
+
+    <string name="accountView_title">Account View</string>
 
     <string name="title_activity_grade_view">GradeViewActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>

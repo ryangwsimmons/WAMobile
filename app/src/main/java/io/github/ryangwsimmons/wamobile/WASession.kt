@@ -104,7 +104,7 @@ class WASession(private val username: String, private val password: String, priv
             throw Exception("Error: The connection has not yet been initialized.")
         }
 
-        //Create a new ArrayList to hold all the terms obtained from the reequest
+        //Create a new ArrayList to hold all the terms obtained from the request
         val terms: ArrayList<Term> = ArrayList()
 
         //Connect to the WebAdvisor grades page for the signed-in user
@@ -401,24 +401,21 @@ class WASession(private val username: String, private val password: String, priv
         val meetingProps: List<String> = meeting.split("|")
 
         //Get the meeting method
-        val method: String
-        method = if (!isDatesOnly(meetingProps)) {
+        val method: String = if (!isDatesOnly(meetingProps)) {
             meetingProps[2].trim()
         } else {
             ""
         }
 
         //Get the meeting days, if available
-        val days: String
-        days = if (!isDatesOnly(meetingProps)) {
+        val days: String = if (!isDatesOnly(meetingProps)) {
             meetingProps[3].trim()
         } else {
             ""
         }
 
         //Get the meeting time, if available
-        val time: String
-        time = if (!isDatesOnly(meetingProps)) {
+        val time: String = if (!isDatesOnly(meetingProps)) {
             meetingProps[4].trim()
         } else {
             ""
@@ -428,8 +425,7 @@ class WASession(private val username: String, private val password: String, priv
         val end: String = meetingProps[1].trim()
 
         //Get the meeting building, if available
-        val building: String
-        building = if (!isDatesOnly(meetingProps)) {
+        val building: String = if (!isDatesOnly(meetingProps)) {
             val location = getLocation(meetingProps)
             if (location != null) {
                 val locationArray = location.split(", ")
@@ -446,8 +442,7 @@ class WASession(private val username: String, private val password: String, priv
         }
 
         //Get the meeting room, if available
-        val room: String
-        room = if (!isDatesOnly(meetingProps)) {
+        val room: String = if (!isDatesOnly(meetingProps)) {
             val location = getLocation(meetingProps)
             if (location != null) {
                 val locationArray = location.split(", ")
@@ -654,5 +649,58 @@ class WASession(private val username: String, private val password: String, priv
 
         //Return a new SectionDetails object containing the data
         return SectionDetails(title, description, offerings, restrctions, prereqs, departments, startDate, endDate, facultyName, facultyEmail, facultyPhone, facultyExtension)
+    }
+
+    @Throws(Exception::class)
+    suspend fun getAccountViewInfo(){
+        //Check that a connection has been initialized
+        if (this.homeCookies.isEmpty()) {
+            throw Exception("Error: The connection has not yet been initialized.")
+        }
+
+        //Connect to the WebAdvisor students page
+        var res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TYPE=M&CONSTITUENCY=WBST&PID=CORE-WBST&TOKENIDX=" + this.homeCookies["LASTTOKEN"])
+            .cookies(this.homeCookies)
+            .followRedirects(true)
+            .execute()
+
+        // Parse the HTML
+        var doc: Document = res.parse()
+
+        // Get the <a> tag for the account view, extract the token
+        val token = "Token=(.*)\$".toRegex().find(
+            doc.getElementsByClass("subnav")[0]
+            .select("h3:contains(Financial Profile) + ul li a")[0]
+            .attr("href")
+        )!!.groupValues[1]
+
+        // Connect to the Ellucian portal by submitting the token retrieved from WebAdvisor
+        res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Finance?Token=$token")
+            .followRedirects(true)
+            .execute()
+
+        // Get the cookies from the response
+        var cookies: MutableMap<String, String> = res.cookies()
+
+        // Navigate to the account activity page
+        res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Finance/AccountActivity")
+            .cookies(cookies)
+            .followRedirects(true)
+            .execute()
+
+        // Parse the response text to get the HTML
+        doc = res.parse()
+
+        // Get the request verification token
+        val reqVerToken = doc.select("input[name='__RequestVerificationToken']").attr("value")
+
+        // Make a request to the Account Activity Info endpoint
+        res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Finance/AccountActivity/GetAccountActivityViewModel")
+            .method(Method.POST)
+            .ignoreContentType(true)
+            .cookies(cookies)
+            .header("__RequestVerificationToken", reqVerToken)
+            .header("X-Requested-With", "XMLHttpRequest")
+            .execute()
     }
 }

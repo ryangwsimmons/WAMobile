@@ -31,6 +31,16 @@
             </menu>
         </item>
 
+        <item android:title="@string/menuItem_financialProfile">
+            <menu>
+                <group android:checkableBehavior="single">
+                    <item
+                        android:id="@+id/menuItem_accountView"
+                        android:title="@string/menuItem_accountView" />
+                </group>
+            </menu>
+        </item>
+
     </group>
 
 </menu>

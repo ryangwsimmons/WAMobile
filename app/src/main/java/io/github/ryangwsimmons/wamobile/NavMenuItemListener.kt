@@ -96,6 +96,14 @@ class NavMenuItemListener(private val session: WASession,
                 fragmentTransaction.replace(R.id.fragmentHolder, SearchSectionsFragment(this@NavMenuItemListener.session, this@NavMenuItemListener.actionBar))
                 fragmentTransaction.commit()
             }
+
+            R.id.menuItem_accountView -> {
+                item.isChecked = true
+
+                val fragmentTransaction: FragmentTransaction = this@NavMenuItemListener.fragmentManager.beginTransaction()
+                fragmentTransaction.replace(R.id.fragmentHolder, AccountViewFragment(this@NavMenuItemListener.session, this@NavMenuItemListener.actionBar))
+                fragmentTransaction.commit()
+            }
         }
 
         //Cross fade back to the fragment container, hide the progress bar
