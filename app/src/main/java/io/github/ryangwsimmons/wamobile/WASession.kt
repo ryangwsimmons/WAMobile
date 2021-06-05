@@ -652,7 +652,7 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    suspend fun getAccountViewInfo(){
+    suspend fun getEllucianCookies(): MutableMap<String, String>{
         //Check that a connection has been initialized
         if (this.homeCookies.isEmpty()) {
             throw Exception("Error: The connection has not yet been initialized.")
@@ -670,8 +670,8 @@ class WASession(private val username: String, private val password: String, priv
         // Get the <a> tag for the account view, extract the token
         val token = "Token=(.*)\$".toRegex().find(
             doc.getElementsByClass("subnav")[0]
-            .select("h3:contains(Financial Profile) + ul li a")[0]
-            .attr("href")
+                .select("h3:contains(Financial Profile) + ul li a")[0]
+                .attr("href")
         )!!.groupValues[1]
 
         // Connect to the Ellucian portal by submitting the token retrieved from WebAdvisor
@@ -680,16 +680,19 @@ class WASession(private val username: String, private val password: String, priv
             .execute()
 
         // Get the cookies from the response
-        var cookies: MutableMap<String, String> = res.cookies()
+        return res.cookies()
+    }
 
+    @Throws(Exception::class)
+    suspend fun getAccountViewInfo(ellucianCookies: MutableMap<String, String>): String{
         // Navigate to the account activity page
-        res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Finance/AccountActivity")
-            .cookies(cookies)
+        var res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Finance/AccountActivity")
+            .cookies(ellucianCookies)
             .followRedirects(true)
             .execute()
 
         // Parse the response text to get the HTML
-        doc = res.parse()
+        var doc = res.parse()
 
         // Get the request verification token
         val reqVerToken = doc.select("input[name='__RequestVerificationToken']").attr("value")
@@ -698,9 +701,11 @@ class WASession(private val username: String, private val password: String, priv
         res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Finance/AccountActivity/GetAccountActivityViewModel")
             .method(Method.POST)
             .ignoreContentType(true)
-            .cookies(cookies)
+            .cookies(ellucianCookies)
             .header("__RequestVerificationToken", reqVerToken)
             .header("X-Requested-With", "XMLHttpRequest")
             .execute()
+
+        return res.body()
     }
 }

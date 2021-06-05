@@ -84,6 +84,7 @@
     <string name="secdet_phone_unable">Unable to open dialer, is this a phone?</string>
 
     <string name="accountView_title">Account View</string>
+    <string name="accountView_noTermsError">Unable to retrieve account view terms.</string>
 
     <string name="title_activity_grade_view">GradeViewActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>

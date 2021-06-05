@@ -11,8 +11,9 @@ import androidx.appcompat.app.ActionBar
 import kotlinx.android.synthetic.main.days_checkboxes.view.*
 import kotlinx.android.synthetic.main.search_sections_filter_group.view.*
 import kotlinx.coroutines.*
+import kotlin.reflect.KFunction3
 
-class SearchSectionsFragment(private var session: WASession, private var actionBar: ActionBar) : Fragment() {
+class SearchSectionsFragment(private var session: WASession, private var actionBar: ActionBar, private var progressBar: View, private var crossFade: KFunction3<View, View, Boolean, Unit>) : Fragment() {
 
     //Create attribute for the list of items in the view
     private lateinit var listItems: View
@@ -81,6 +82,7 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
                 this@SearchSectionsFragment.days = ArrayList()
 
                 this@SearchSectionsFragment.initializeAdapters(terms, subjects, courseLevels, timesList, locations, academicLevels)
+                crossFade(activity!!.findViewById(R.id.fragment_container), progressBar, false)
             }
         }
 

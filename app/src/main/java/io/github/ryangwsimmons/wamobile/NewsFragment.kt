@@ -10,8 +10,9 @@ import androidx.appcompat.app.ActionBar
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import kotlinx.coroutines.*
+import kotlin.reflect.KFunction3
 
-class NewsFragment(private var session: WASession, private var actionBar: ActionBar) : Fragment() {
+class NewsFragment(private var session: WASession, private var actionBar: ActionBar, private var progressBar: View, private var crossFade: KFunction3<View, View, Boolean, Unit>) : Fragment() {
 
     private lateinit var newsItems: List<NewsItem>
 
@@ -49,6 +50,7 @@ class NewsFragment(private var session: WASession, private var actionBar: Action
             this@NewsFragment.newsItems = session.getNewsItems()
 
             withContext(Dispatchers.Main) {
+                crossFade(activity!!.findViewById(R.id.fragment_container), progressBar, false)
                 adapter.setItems(this@NewsFragment.newsItems)
                 adapter.notifyItemInserted(this@NewsFragment.newsItems.size - 1)
             }

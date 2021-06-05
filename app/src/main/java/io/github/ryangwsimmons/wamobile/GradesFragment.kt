@@ -15,8 +15,9 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import kotlin.reflect.KFunction3
 
-class GradesFragment(private var session: WASession, private var actionBar: ActionBar) : Fragment(), TermsAdapter.OnTermClickListener {
+class GradesFragment(private var session: WASession, private var actionBar: ActionBar, private var progressBar: View, private var crossFade: KFunction3<View, View, Boolean, Unit>) : Fragment(), TermsAdapter.OnTermClickListener {
 
     private lateinit var terms: ArrayList<Term>
 
@@ -54,6 +55,7 @@ class GradesFragment(private var session: WASession, private var actionBar: Acti
             this@GradesFragment.terms = session.getTerms()
 
             withContext(Main) {
+                crossFade(activity!!.findViewById(R.id.fragment_container), progressBar, false)
                 adapter.setItems(this@GradesFragment.terms)
                 adapter.notifyItemInserted(this@GradesFragment.terms.size - 1)
             }

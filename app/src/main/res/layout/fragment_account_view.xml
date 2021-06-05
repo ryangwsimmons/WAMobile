@@ -1,13 +1,38 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:context=".AccountViewFragment">
 
-    <TextView
+    <LinearLayout
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:text="@string/hello_blank_fragment" />
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical">
 
-</RelativeLayout>
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="8dp"
+            android:layout_marginStart="8dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_term"
+                android:textSize="20sp"
+                android:text="@string/search_sections_term" />
+
+            <Spinner
+                android:layout_width="215dp"
+                android:layout_height="wrap_content"
+                android:id="@+id/spinner_terms"
+                android:layout_toEndOf="@id/textView_term"
+                android:layout_alignTop="@id/textView_term"
+                android:layout_alignBottom="@id/textView_term"
+                android:layout_marginStart="8dp" />
+        </RelativeLayout>
+
+    </LinearLayout>
+
+</ScrollView>

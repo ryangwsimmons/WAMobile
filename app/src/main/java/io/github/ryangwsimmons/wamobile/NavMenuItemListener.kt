@@ -9,7 +9,6 @@ import android.widget.ProgressBar
 import androidx.appcompat.app.ActionBar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
-import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentManager
 import androidx.fragment.app.FragmentTransaction
 import com.google.android.material.navigation.NavigationView
@@ -60,7 +59,12 @@ class NavMenuItemListener(private val session: WASession,
         viewIn.bringToFront()
 
         //Animate the in view to 100% opacity, and clear any animation
-        viewIn.animate().alpha(1f).setDuration(crossFadeDuration).setListener(null)
+        viewIn.animate().alpha(1f).setDuration(crossFadeDuration).setListener(object: AnimatorListenerAdapter() {
+            override fun onAnimationEnd(animation: Animator?) {
+                animation!!.removeAllListeners()
+                viewIn.animate().alpha(1f).setDuration(crossFadeDuration).setListener(this)
+            }
+        })
 
         //Animate the out view to 0% opacity.
         //After the animation ends, set its visibility to GONE for optimization purposes
@@ -77,7 +81,7 @@ class NavMenuItemListener(private val session: WASession,
                 item.isChecked = true
 
                 val fragmentTransaction: FragmentTransaction = this@NavMenuItemListener.fragmentManager.beginTransaction()
-                fragmentTransaction.replace(R.id.fragmentHolder, NewsFragment(this@NavMenuItemListener.session, this@NavMenuItemListener.actionBar))
+                fragmentTransaction.replace(R.id.fragmentHolder, NewsFragment(this@NavMenuItemListener.session, this@NavMenuItemListener.actionBar, progressBar, ::crossFade))
                 fragmentTransaction.commit()
             }
 
@@ -85,7 +89,7 @@ class NavMenuItemListener(private val session: WASession,
                 item.isChecked = true
 
                 val fragmentTransaction: FragmentTransaction = this@NavMenuItemListener.fragmentManager.beginTransaction()
-                fragmentTransaction.replace(R.id.fragmentHolder, GradesFragment(this@NavMenuItemListener.session, this@NavMenuItemListener.actionBar))
+                fragmentTransaction.replace(R.id.fragmentHolder, GradesFragment(this@NavMenuItemListener.session, this@NavMenuItemListener.actionBar, progressBar, ::crossFade))
                 fragmentTransaction.commit()
             }
 
@@ -93,7 +97,7 @@ class NavMenuItemListener(private val session: WASession,
                 item.isChecked = true
 
                 val fragmentTransaction: FragmentTransaction = this@NavMenuItemListener.fragmentManager.beginTransaction()
-                fragmentTransaction.replace(R.id.fragmentHolder, SearchSectionsFragment(this@NavMenuItemListener.session, this@NavMenuItemListener.actionBar))
+                fragmentTransaction.replace(R.id.fragmentHolder, SearchSectionsFragment(this@NavMenuItemListener.session, this@NavMenuItemListener.actionBar, progressBar, ::crossFade))
                 fragmentTransaction.commit()
             }
 
@@ -101,13 +105,10 @@ class NavMenuItemListener(private val session: WASession,
                 item.isChecked = true
 
                 val fragmentTransaction: FragmentTransaction = this@NavMenuItemListener.fragmentManager.beginTransaction()
-                fragmentTransaction.replace(R.id.fragmentHolder, AccountViewFragment(this@NavMenuItemListener.session, this@NavMenuItemListener.actionBar))
+                fragmentTransaction.replace(R.id.fragmentHolder, AccountViewFragment(this@NavMenuItemListener.session, this@NavMenuItemListener.actionBar, progressBar, ::crossFade))
                 fragmentTransaction.commit()
             }
         }
-
-        //Cross fade back to the fragment container, hide the progress bar
-        crossFade(fragmentContainer, progressBar, false)
 
         //Remove the listener so that other events besides selecting another item do not call it again
         if (listener != null) {
