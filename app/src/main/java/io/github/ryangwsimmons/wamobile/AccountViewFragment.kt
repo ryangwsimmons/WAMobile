@@ -64,10 +64,10 @@ class AccountViewFragment(private var session: WASession, private var actionBar:
         // Create an ArrayList of strings from the account activity JSON object
         try {
             val termsArray = this.accountActivity.getJSONArray("TermPeriodBalances")
-            val terms = ArrayList<String>()
+            val terms = ArrayList<DropdownOption>()
             for (i in 0 until termsArray.length()) {
                 val termObject = termsArray.getJSONObject(i)
-                terms.add(termObject.getString("Description"))
+                terms.add(DropdownOption(termObject.getString("Description"), termObject.getString("AccountActivityUrl")))
             }
 
             // Create an adapter for the spinner
