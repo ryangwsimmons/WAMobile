@@ -684,7 +684,7 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    suspend fun getAccountViewInfo(ellucianCookies: MutableMap<String, String>): String{
+    suspend fun getAccountViewInfo(ellucianCookies: MutableMap<String, String>, timeFrameID: String = ""): String{
         // Navigate to the account activity page
         var res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Finance/AccountActivity")
             .cookies(ellucianCookies)
@@ -697,13 +697,22 @@ class WASession(private val username: String, private val password: String, priv
         // Get the request verification token
         val reqVerToken = doc.select("input[name='__RequestVerificationToken']").attr("value")
 
+        // If a time frame ID has been passed in, form the request body
+        val bodyJSON = if (timeFrameID != "") {
+            "{\"timeframeId\":\"$timeFrameID\"}"
+        } else {
+            "{}"
+        }
+
         // Make a request to the Account Activity Info endpoint
         res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Finance/AccountActivity/GetAccountActivityViewModel")
             .method(Method.POST)
             .ignoreContentType(true)
             .cookies(ellucianCookies)
+            .header("Content-Type", "application/json")
             .header("__RequestVerificationToken", reqVerToken)
             .header("X-Requested-With", "XMLHttpRequest")
+            .requestBody(bodyJSON)
             .execute()
 
         return res.body()

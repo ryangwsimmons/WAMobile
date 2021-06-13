@@ -1,38 +1,39 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    tools:context=".AccountViewFragment">
+    android:layout_height="fill_parent"
+    tools:context=".AccountViewFragment"
+    android:orientation="vertical">
 
-    <LinearLayout
-        android:layout_width="match_parent"
+    <RelativeLayout
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:gravity="center_horizontal"
-        android:orientation="vertical">
-
-        <RelativeLayout
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="16dp"
+        android:layout_marginStart="8dp"
+        android:layout_gravity="center_horizontal">
+        <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="8dp"
-            android:layout_marginStart="8dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/textView_term"
-                android:textSize="20sp"
-                android:text="@string/search_sections_term" />
+            android:id="@+id/textView_term"
+            android:textSize="20sp"
+            android:text="@string/search_sections_term" />
 
-            <Spinner
-                android:layout_width="215dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/spinner_terms"
-                android:layout_toEndOf="@id/textView_term"
-                android:layout_alignTop="@id/textView_term"
-                android:layout_alignBottom="@id/textView_term"
-                android:layout_marginStart="8dp" />
-        </RelativeLayout>
+        <Spinner
+            android:layout_width="215dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/spinner_terms"
+            android:layout_toEndOf="@id/textView_term"
+            android:layout_alignTop="@id/textView_term"
+            android:layout_alignBottom="@id/textView_term"
+            android:layout_marginStart="8dp" />
+    </RelativeLayout>
 
-    </LinearLayout>
+    <ExpandableListView
+        android:id="@+id/transactions_list"
+        android:layout_width="match_parent"
+        android:layout_height="fill_parent"
+        android:layout_margin="8dp" />
 
-</ScrollView>
+</LinearLayout>
