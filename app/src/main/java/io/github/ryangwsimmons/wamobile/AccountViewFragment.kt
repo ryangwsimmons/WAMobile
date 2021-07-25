@@ -10,6 +10,9 @@ import androidx.appcompat.app.ActionBar
 import kotlinx.coroutines.*
 import org.json.JSONException
 import org.json.JSONObject
+import java.text.NumberFormat
+import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.reflect.KFunction3
 
 class AccountViewFragment(private var session: WASession, private var actionBar: ActionBar, private var progressBar: View, private var crossFade: KFunction3<View, View, Boolean, Unit>) : Fragment() {
@@ -93,6 +96,12 @@ class AccountViewFragment(private var session: WASession, private var actionBar:
                 if (dropDownOption == null) {
                     this@AccountViewFragment.populateTermsSpinner()
                 }
+
+                // Set the balance
+                val balanceTextView = this@AccountViewFragment.listItems.findViewById<TextView>(R.id.textView_balance)
+                val balanceFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
+                balanceFormat.currency = Currency.getInstance("CAD")
+                balanceTextView.text = balanceFormat.format(this@AccountViewFragment.currentTerm.balance)
 
                 // Create the list adapter, and set it as the adapter for the main ExpandableListView
                 val transactionsListAdapter = AccountViewListViewAdapter(this@AccountViewFragment.currentTerm.categories, activity!!.applicationContext)

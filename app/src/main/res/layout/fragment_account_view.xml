@@ -30,6 +30,34 @@
             android:layout_marginStart="8dp" />
     </RelativeLayout>
 
+    <RelativeLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginEnd="8dp"
+        android:paddingHorizontal="8dp"
+        android:paddingVertical="16dp"
+        android:background="@color/colorEllucianDarkGrey">
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:textSize="20sp"
+            android:gravity="left"
+            android:textColor="@color/colorEllucianTextWhite"
+            android:text="@string/accountView_balance" />
+
+        <TextView
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:id="@+id/textView_balance"
+            android:textSize="20sp"
+            android:gravity="right"
+            android:textColor="@color/colorEllucianTextWhite"
+            android:text="$9,999.99" />
+    </RelativeLayout>
+
     <ExpandableListView
         android:id="@+id/transactions_list"
         android:layout_width="match_parent"

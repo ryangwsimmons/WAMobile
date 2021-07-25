@@ -5,4 +5,6 @@
     <color name="colorAccent">#F48F01</color>
     <color name="colorShaded">#E5E5E5</color>
     <color name="colorEmptySection">#F7AAAA</color>
+    <color name="colorEllucianDarkGrey">#444444</color>
+    <color name="colorEllucianTextWhite">#F4F4F4</color>
 </resources>
