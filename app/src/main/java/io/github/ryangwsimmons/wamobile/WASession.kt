@@ -4,8 +4,6 @@ package io.github.ryangwsimmons.wamobile
 
 import android.annotation.SuppressLint
 import android.os.Parcelable
-import android.text.Html
-import android.text.Spanned
 import kotlinx.android.parcel.Parcelize
 import org.jsoup.Connection.Method
 import org.jsoup.Connection.Response
@@ -98,7 +96,7 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    suspend fun getTerms(): ArrayList<Term> {
+    fun getTerms(): ArrayList<Term> {
         //Check that a connection has been initialized
         if (this.homeCookies.isEmpty()) {
             throw Exception("Error: The connection has not yet been initialized.")
@@ -131,7 +129,7 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    suspend fun getGrades(termPosition: Int, terms: List<Term>, grades: ArrayList<Grade>, advisor: StringBuilder, termGPA: StringBuilder) {
+    fun getGrades(termPosition: Int, terms: List<Term>, grades: ArrayList<Grade>, advisor: StringBuilder, termGPA: StringBuilder) {
         //Check that a connection has been initialized
         if (this.homeCookies.isEmpty()) {
             throw Exception("Error: The connection has not yet been initialized.")
@@ -204,57 +202,59 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    fun getNewsItems(): List<NewsItem> {
+    fun getNews(): NewsData {
         //Check that a connection has been initialized
         if (this.homeCookies.isEmpty()) {
             throw Exception("Error: The connection has not yet been initialized.")
         }
 
-        //Create an ArrayList to store the news items
-        val newsItems = ArrayList<NewsItem>()
+        // Create a string to hold the news HTML
+        var html = ""
 
-        //Make a connection to the WebAdvisor main page for students (the one with the news)
-        val res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + this.homeCookies["LASTTOKEN"] + "&type=M&constituency=WBST&pid=CORE-WBST")
-            .cookies(this.homeCookies)
-            .followRedirects(true)
-            .execute()
+        // Make a connection to the WebAdvisor main page for students (the one with the news)
+        var res: Response =
+            Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + this.homeCookies["LASTTOKEN"] + "&type=M&constituency=WBST&pid=CORE-WBST")
+                .cookies(this.homeCookies)
+                .followRedirects(true)
+                .execute()
 
-        //Parse the resulting document's HTML
+        // Parse the resulting document's HTML
         val doc: Document = res.parse()
 
-        //Loop through all the news items on the page, adding each item to the ArrayList of news items
-        var studentGroup: String = ""
-        var itemHeading: String = ""
-        var itemBody: Spanned
-        var i: Int = 0
-        for (customText: Element in doc.getElementById("content").getElementsByClass("customText")) {
-            if (customText.getElementsByTag("h1").size > 0 && customText.getElementsByTag("h2").size > 0 && customText.getElementsByTag("p").size > 0) {
-                for (element: Element in customText.children()) {
-                    //Get the main heading of a particular news item
-                    if (element.tagName() == "h1") {
-                        studentGroup = element.text()
-                    }
-
-                    //Get the subheading of a particular news item
-                    if (element.tagName() == "h2") {
-                        itemHeading = element.text()
-                    }
-
-                    //Get the body of a particular news item, create new NewsItem object, and add the item to it
-                    if (element.tagName() == "p") {
-                        itemBody = if (android.os.Build.VERSION.SDK_INT > 23) {
-                            Html.fromHtml(element.html(), Html.FROM_HTML_MODE_COMPACT)
-                        } else {
-                            Html.fromHtml(element.html())
-                        }
-                        newsItems.add(NewsItem(itemHeading, studentGroup, itemBody))
-                    }
-                }
+        // Find the news HTML in the page body
+        for (customText: Element in doc.getElementById("content")
+            .getElementsByClass("customText")) {
+            if (customText.getElementsByTag("h1").size > 0 && customText.getElementsByTag("h2").size > 0 && customText.getElementsByTag(
+                    "p"
+                ).size > 0
+            ) {
+                html = customText.html()
+                break
             }
         }
 
-        //Return the resulting list of news items
-        return newsItems
+        // Add the outer divs back to the HTML, so that CSS styling works correctly
+        html = "<div id=\"main\"><div id=\"content\">$html</div></div>"
+
+        // Get the CSS for the news HTML
+        res = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/stylesheets/themes/GUELPH/template.css")
+                .cookies(this.homeCookies)
+                .followRedirects(true)
+                .ignoreContentType(true)
+                .execute()
+
+        var css: String = res.body()
+
+        res = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/stylesheets/themes/GUELPH/ug-override.css")
+            .cookies(this.homeCookies)
+            .followRedirects(true)
+            .ignoreContentType(true)
+            .execute()
+
+        css += res.body()
+
+        // Return the news data
+        return NewsData(html, css)
     }
 
     @Throws(Exception::class)
@@ -274,12 +274,12 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    suspend fun getSearchSectionsFilterValues(terms: ArrayList<DropdownOption>,
-                                                    subjects: ArrayList<DropdownOption>,
-                                                    courseLevels: ArrayList<DropdownOption>,
-                                                    times: ArrayList<DropdownOption>,
-                                                    locations: ArrayList<DropdownOption>,
-                                                    academicLevels: ArrayList<DropdownOption>) {
+    fun getSearchSectionsFilterValues(terms: ArrayList<DropdownOption>,
+                                      subjects: ArrayList<DropdownOption>,
+                                      courseLevels: ArrayList<DropdownOption>,
+                                      times: ArrayList<DropdownOption>,
+                                      locations: ArrayList<DropdownOption>,
+                                      academicLevels: ArrayList<DropdownOption>) {
         //Check that a connection has been initialized
         if (this.homeCookies.isEmpty()) {
             throw Exception("Error: The connection has not yet been initialized.")
@@ -384,7 +384,7 @@ class WASession(private val username: String, private val password: String, priv
         }
 
         //Regular expression that checks if the meeting string is just dates
-        var regex: Regex = Regex("^(\\d{4}/\\d{2}/\\d{2})-(\\d{4}/\\d{2}/\\d{2})$")
+        var regex = Regex("^(\\d{4}/\\d{2}/\\d{2})-(\\d{4}/\\d{2}/\\d{2})$")
 
         if (regex.matches(meeting)) {
             //If just dates, put a "|" between the start and end dates
@@ -492,18 +492,18 @@ class WASession(private val username: String, private val password: String, priv
 
 
     @Throws(Exception::class)
-    suspend fun getSearchResults(term: String,
-                                        subjects: ArrayList<String>,
-                                        courseLevels: ArrayList<String>,
-                                        courseNums: ArrayList<String>,
-                                        sections: ArrayList<String>,
-                                        times: ArrayList<String>,
-                                        days: ArrayList<Boolean>,
-                                        courseKeywords: String,
-                                        location: String,
-                                        academicLevel: String,
-                                        instructorsLastName: String,
-                                        cookies: MutableMap<String, String>): ArrayList<SearchResult> {
+    fun getSearchResults(term: String,
+                         subjects: ArrayList<String>,
+                         courseLevels: ArrayList<String>,
+                         courseNums: ArrayList<String>,
+                         sections: ArrayList<String>,
+                         times: ArrayList<String>,
+                         days: ArrayList<Boolean>,
+                         courseKeywords: String,
+                         location: String,
+                         academicLevel: String,
+                         instructorsLastName: String,
+                         cookies: MutableMap<String, String>): ArrayList<SearchResult> {
         //Make initial request to filters page
         var res: Response = this.getSearchSectionsResponse()
 
@@ -564,7 +564,7 @@ class WASession(private val username: String, private val password: String, priv
 
                 val meetings: ArrayList<String> = ArrayList()
                 var unformattedMeetingsString: String = result.getElementsByClass("SEC_MEETING_INFO")[0].getElementsByTag("p")[0].text()
-                val regex: Regex = Regex("([ \\n])(\\d{4}/\\d{2}/\\d{2}|/  / {2}  )")
+                val regex = Regex("([ \\n])(\\d{4}/\\d{2}/\\d{2}|/ {2}/ {2} {2})")
                 unformattedMeetingsString = regex.replace(unformattedMeetingsString) { match -> "^" + match.groupValues[2]}
                 val unformattedMeetings = unformattedMeetingsString.split("^")
                 unformattedMeetings.forEachIndexed { index, unformattedMeeting ->
@@ -608,7 +608,7 @@ class WASession(private val username: String, private val password: String, priv
         val courseName: String = (courseNameSections[0] + courseNameSections[1]).toLowerCase()
 
         //Create a variable that holds the url for the course calendar, and populate it based on the academic level of the course
-        var calendarURL: String = ""
+        var calendarURL = ""
         when (result.academicLevel) {
             "Diploma" -> calendarURL = "https://www.uoguelph.ca/registrar/calendars/diploma/current/courses/"
             "Graduate" -> calendarURL = "https://www.uoguelph.ca/registrar/calendars/graduate/current/courses/"
@@ -627,15 +627,15 @@ class WASession(private val username: String, private val password: String, priv
         //Get the section details, and store them in variables
         val title: String = calDoc.getElementById("content").getElementsByClass("title")[0].text()
         val description: String = calDoc.getElementById("content").getElementsByClass("description")[0].text()
-        var offerings: String = ""
+        var offerings = ""
         if (calDoc.getElementById("content").getElementsByClass("offerings").size > 0) {
             offerings = calDoc.getElementById("content").getElementsByClass("offerings")[0].getElementsByClass("text")[0].text()
         }
-        var restrctions: String = ""
+        var restrictions = ""
         if (calDoc.getElementById("content").getElementsByClass("restrictions").size > 0) {
-            restrctions = calDoc.getElementById("content").getElementsByClass("restrictions")[0].getElementsByClass("text")[0].text()
+            restrictions = calDoc.getElementById("content").getElementsByClass("restrictions")[0].getElementsByClass("text")[0].text()
         }
-        var prereqs: String = ""
+        var prereqs = ""
         if (calDoc.getElementById("content").getElementsByClass("prereqs").size > 0){
             prereqs = calDoc.getElementById("content").getElementsByClass("prereqs")[0].getElementsByClass("text")[0].text()
         }
@@ -648,11 +648,11 @@ class WASession(private val username: String, private val password: String, priv
         val facultyExtension: String = doc.getElementById("LIST_VAR9_1").text()
 
         //Return a new SectionDetails object containing the data
-        return SectionDetails(title, description, offerings, restrctions, prereqs, departments, startDate, endDate, facultyName, facultyEmail, facultyPhone, facultyExtension)
+        return SectionDetails(title, description, offerings, restrictions, prereqs, departments, startDate, endDate, facultyName, facultyEmail, facultyPhone, facultyExtension)
     }
 
     @Throws(Exception::class)
-    suspend fun getEllucianCookies(): MutableMap<String, String>{
+    fun getEllucianCookies(): MutableMap<String, String>{
         //Check that a connection has been initialized
         if (this.homeCookies.isEmpty()) {
             throw Exception("Error: The connection has not yet been initialized.")
@@ -665,7 +665,7 @@ class WASession(private val username: String, private val password: String, priv
             .execute()
 
         // Parse the HTML
-        var doc: Document = res.parse()
+        val doc: Document = res.parse()
 
         // Get the <a> tag for the account view, extract the token
         val token = "Token=(.*)\$".toRegex().find(
@@ -684,7 +684,7 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    suspend fun getAccountViewInfo(ellucianCookies: MutableMap<String, String>, timeFrameID: String = ""): String{
+    fun getAccountViewInfo(ellucianCookies: MutableMap<String, String>, timeFrameID: String = ""): String{
         // Navigate to the account activity page
         var res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Finance/AccountActivity")
             .cookies(ellucianCookies)
@@ -692,7 +692,7 @@ class WASession(private val username: String, private val password: String, priv
             .execute()
 
         // Parse the response text to get the HTML
-        var doc = res.parse()
+        val doc = res.parse()
 
         // Get the request verification token
         val reqVerToken = doc.select("input[name='__RequestVerificationToken']").attr("value")
