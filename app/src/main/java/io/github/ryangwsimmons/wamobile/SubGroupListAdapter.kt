@@ -8,23 +8,16 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
 import android.widget.TextView
-import org.json.JSONArray
-import org.json.JSONObject
 import java.util.*
 
-class SubGroupListAdapter(private val parentContext: Context, private val transactions: JSONArray): BaseExpandableListAdapter() {
-    override fun getGroupCount(): Int = this.transactions.length()
+class SubGroupListAdapter(private val parentContext: Context, private val transaction: AccountViewTransaction): BaseExpandableListAdapter() {
+    override fun getGroupCount(): Int = 1
 
-    override fun getChildrenCount(groupPosition: Int): Int = this.transactions
-        .getJSONObject(groupPosition)
-        .getJSONArray("ChargeDetails").length()
+    override fun getChildrenCount(groupPosition: Int): Int = this.transaction.chargeDetails.size
 
-    override fun getGroup(groupPosition: Int): Any = this.transactions.getJSONObject(groupPosition)
+    override fun getGroup(groupPosition: Int): AccountViewTransaction = this.transaction
 
-    override fun getChild(groupPosition: Int, childPosition: Int): Any = this.transactions
-        .getJSONObject(groupPosition)
-        .getJSONArray("ChargeDetails")
-        .getJSONObject(childPosition)
+    override fun getChild(groupPosition: Int, childPosition: Int): AccountViewChargeDetails = this.transaction.chargeDetails[childPosition]
 
     override fun getGroupId(groupPosition: Int): Long = groupPosition.toLong()
 
@@ -46,14 +39,15 @@ class SubGroupListAdapter(private val parentContext: Context, private val transa
             convertView
         }
 
+        // Define the group name and amount
         val groupName: TextView = groupConvertView.findViewById(R.id.groupName)
         val groupAmount: TextView = groupConvertView.findViewById(R.id.groupAmount)
 
-        groupName.text = (getGroup(groupPosition) as JSONObject).getString("Description")
+        groupName.text = getGroup(groupPosition).name
 
         val amountFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
         amountFormat.currency = Currency.getInstance("CAD")
-        groupAmount.text = amountFormat.format((getGroup(groupPosition) as JSONObject).getDouble("Amount"))
+        groupAmount.text = amountFormat.format(getGroup(groupPosition).amount)
 
         return groupConvertView
     }
@@ -68,31 +62,17 @@ class SubGroupListAdapter(private val parentContext: Context, private val transa
         val layoutInflater = this.parentContext.getSystemService(Context.LAYOUT_INFLATER_SERVICE) as LayoutInflater
         val itemConvertView = layoutInflater.inflate(R.layout.account_view_list_item, null)
 
-        val child = getChild(groupPosition, childPosition) as JSONObject
+        // Get the data for the child
+        val child = getChild(groupPosition, childPosition)
 
+        // Define the child name and amount
         val itemName: TextView = itemConvertView.findViewById(R.id.itemName)
-        itemName.text = when {
-            child.has("Description") -> {
-                child.getString("Description")
-            }
-            child.has("Name") -> {
-                child.getString("Name")
-            }
-            child.has("PaymentMethodCode") -> {
-                child.getString("PaymentMethodCode")
-            }
-            child.has("TypeDescription") -> {
-                child.getString("TypeDescription")
-            }
-            else -> {
-                "Unknown Transaction Item $childPosition"
-            }
-        }
+        itemName.text = child.name
 
         val itemAmount: TextView = itemConvertView.findViewById(R.id.itemAmount)
         val amountFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
         amountFormat.currency = Currency.getInstance("CAD")
-        itemAmount.text = amountFormat.format(child.getDouble("Amount"))
+        itemAmount.text = amountFormat.format(child.amount)
 
         return itemConvertView
     }

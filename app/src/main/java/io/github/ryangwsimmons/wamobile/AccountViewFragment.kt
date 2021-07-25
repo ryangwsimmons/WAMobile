@@ -8,7 +8,6 @@ import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.ActionBar
 import kotlinx.coroutines.*
-import org.json.JSONArray
 import org.json.JSONException
 import org.json.JSONObject
 import kotlin.reflect.KFunction3
@@ -18,8 +17,11 @@ class AccountViewFragment(private var session: WASession, private var actionBar:
     // Cookies for the Ellucian portal where the account activity page is located
     private lateinit var ellucianCookies: MutableMap<String, String>
 
-    // The JSON object containing all account activity info for the current term
-    private lateinit var accountActivity: JSONObject
+    // The currently selected term in the terms spinner
+    private lateinit var currentTerm: AccountViewTerm
+
+    // A list of all the terms available in the account view spinner
+    private val allTerms: ArrayList<AccountViewTerm> = ArrayList<AccountViewTerm>()
 
     // The items in the fragment, allows content to be updated later if necessary
     private lateinit var listItems: View
@@ -47,7 +49,6 @@ class AccountViewFragment(private var session: WASession, private var actionBar:
         //Launch a coroutine to get the account view
         CoroutineScope(errorHandler).launch {
             this@AccountViewFragment.ellucianCookies = session.getEllucianCookies()
-            this@AccountViewFragment.accountActivity = JSONObject(session.getAccountViewInfo(this@AccountViewFragment.ellucianCookies))
 
             withContext(Dispatchers.Main) {
                 this@AccountViewFragment.getAccountViewInfo(null)
@@ -58,14 +59,135 @@ class AccountViewFragment(private var session: WASession, private var actionBar:
         return listItems
     }
 
+    private fun getAccountViewInfo(dropDownOption: DropdownOption?) {
+        //Create an error handler for the coroutine that will be executed to get the new account view info
+        val errorHandler = CoroutineExceptionHandler { _, error ->
+            CoroutineScope(Dispatchers.Main).launch {
+                Toast.makeText(activity!!.applicationContext, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
+                if (error.message != null) {
+                    Toast.makeText(activity!!.applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
+                }
+            }
+        }
+
+        // Start a cross-fade while the data is being retrieved, if one does not already exist
+        if (dropDownOption != null) {
+            crossFade(progressBar, activity!!.findViewById(R.id.fragment_container), false)
+        }
+
+        //Launch a coroutine to get the account view
+        CoroutineScope(errorHandler).launch {
+            val accountActivity: JSONObject = if (dropDownOption == null) {
+                JSONObject(session.getAccountViewInfo(this@AccountViewFragment.ellucianCookies))
+            } else {
+                JSONObject(session.getAccountViewInfo(this@AccountViewFragment.ellucianCookies, dropDownOption.value))
+            }
+
+            withContext(Dispatchers.Main) {
+                crossFade(activity!!.findViewById(R.id.fragment_container), progressBar, false)
+
+                // Wrap the JSON data to native Kotlin objects
+                this@AccountViewFragment.wrapData(accountActivity)
+
+                // If this is the initial call, populate the terms spinner
+                if (dropDownOption == null) {
+                    this@AccountViewFragment.populateTermsSpinner()
+                }
+
+                // Create the list adapter, and set it as the adapter for the main ExpandableListView
+                val transactionsListAdapter = AccountViewListViewAdapter(this@AccountViewFragment.currentTerm.categories, activity!!.applicationContext)
+                val transactionsListView: ExpandableListView = this@AccountViewFragment.listItems.findViewById(R.id.transactions_list)
+                transactionsListView.setAdapter(transactionsListAdapter)
+            }
+        }
+    }
+
+    // This function wraps the JSON data from the account view in native Kotlin objects
+    // This will make it easier to fix in the future if the JSON data structure ever changes
+    private fun wrapData(jsonData: JSONObject) {
+        // Populate the list of terms
+        val termsArray = jsonData.getJSONArray("TermPeriodBalances")
+
+        // Populate the data object with the JSON data
+        for (i in 0 until termsArray.length()) {
+            val termObject = termsArray.getJSONObject(i)
+            this.allTerms.add(AccountViewTerm(termObject.getString("Id"), termObject.getString("Description"), termObject.getDouble("Balance")))
+        }
+
+        // Create an object for the currently selected term
+        this.currentTerm = AccountViewTerm(jsonData.getString("DisplayTermPeriodCode"), jsonData.getString("DisplayTermPeriodDescription"), jsonData.getDouble("Balance"))
+
+        // Loop through each category, adding the data to the account view term object
+        val categoriesArray = jsonData.getJSONArray("FormulaCategories")
+        for (i in 0 until categoriesArray.length()) {
+            // Get the category JSON object
+            val categoryJson = categoriesArray.getJSONObject(i)
+
+            // Create the category Kotlin object, if it should be visible
+            if (categoryJson.getBoolean("IsVisible")) {
+                val categoryObject = AccountViewCategory(categoryJson.getString("Description"), categoryJson.getDouble("Amount"))
+
+                // Loop through each transaction in the category
+                val transactionsArray = categoryJson.getJSONArray("Transactions")
+                for (j in 0 until transactionsArray.length()) {
+                    // Get the transaction JSON object
+                    val transactionJson = transactionsArray.getJSONObject(j)
+
+                    // Create the transaction Kotlin object, if it should be visible
+                    if (!transactionJson.has("IsVisible") || (transactionJson.has("IsVisible") && transactionJson.getBoolean("IsVisible"))) {
+                        val transactionName = when {
+                            transactionJson.has("Description") -> transactionJson.getString("Description")
+                            transactionJson.has("Name") -> transactionJson.getString("Name")
+                            transactionJson.has("PaymentMethodCode") -> transactionJson.getString("PaymentMethodCode")
+                            transactionJson.has("TypeDescription") -> transactionJson.getString(("TypeDescription"))
+                            else -> "Unknown Transaction Item $j"
+                        }
+                        val transactionObject = AccountViewTransaction(
+                            transactionName,
+                            transactionJson.getDouble("Amount")
+                        )
+
+                        // Loop through each charge details array in the transaction, if such an array exists
+                        if (transactionJson.has("ChargeDetails")) {
+                            val chargeDetailsArray = transactionJson.getJSONArray("ChargeDetails")
+                            for (k in 0 until chargeDetailsArray.length()) {
+                                val chargeDetailsJson = chargeDetailsArray.getJSONObject(k)
+
+                                // Create the charge details Kotlin object
+                                val chargeName = when {
+                                    chargeDetailsJson.has("Name") -> chargeDetailsJson.getString("Name")
+                                    chargeDetailsJson.has("Description") -> chargeDetailsJson.getString(
+                                        "Description"
+                                    )
+                                    else -> "Unknown Charge Item $k"
+                                }
+                                val chargeDetailsObject = AccountViewChargeDetails(
+                                    chargeName,
+                                    chargeDetailsJson.getDouble("Amount")
+                                )
+
+                                // Add the charge to the transactions object
+                                transactionObject.chargeDetails.add(chargeDetailsObject)
+                            }
+                        }
+
+                        // Add the transaction to the category object
+                        categoryObject.transactions.add(transactionObject)
+                    }
+                }
+
+                // Add the category object to the term object
+                this.currentTerm.categories.add(categoryObject)
+            }
+        }
+    }
+
     private fun populateTermsSpinner() {
         // Create an ArrayList of strings from the account activity JSON object
         try {
-            val termsArray = this.accountActivity.getJSONArray("TermPeriodBalances")
             val terms = ArrayList<DropdownOption>()
-            for (i in 0 until termsArray.length()) {
-                val termObject = termsArray.getJSONObject(i)
-                terms.add(DropdownOption(termObject.getString("Description"), termObject.getString("Id")))
+            for (term in this.allTerms) {
+                terms.add(DropdownOption(term.name, term.id))
             }
 
             // Create an adapter for the spinner
@@ -93,55 +215,6 @@ class AccountViewFragment(private var session: WASession, private var actionBar:
         } catch(error: JSONException) {
             Toast.makeText(activity!!.applicationContext, error.message, Toast.LENGTH_LONG).show()
             Toast.makeText(activity!!.applicationContext, getString(R.string.accountView_noTermsError), Toast.LENGTH_LONG).show()
-        }
-    }
-
-    private fun getAccountViewInfo(dropDownOption: DropdownOption?) {
-        //Create an error handler for the coroutine that will be executed to get the new account view info
-        val errorHandler = CoroutineExceptionHandler { _, error ->
-            CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(activity!!.applicationContext, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
-                if (error.message != null) {
-                    Toast.makeText(activity!!.applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
-                }
-            }
-        }
-
-        // Start a cross-fade while the data is being retrieved, if one does not already exist
-        if (dropDownOption != null) {
-            crossFade(progressBar, activity!!.findViewById(R.id.fragment_container), false)
-        }
-
-        //Launch a coroutine to get the account view
-        CoroutineScope(errorHandler).launch {
-            if (dropDownOption == null) {
-                this@AccountViewFragment.accountActivity = JSONObject(session.getAccountViewInfo(this@AccountViewFragment.ellucianCookies))
-            } else {
-                this@AccountViewFragment.accountActivity = JSONObject(session.getAccountViewInfo(this@AccountViewFragment.ellucianCookies, dropDownOption.value))
-            }
-
-            withContext(Dispatchers.Main) {
-                crossFade(activity!!.findViewById(R.id.fragment_container), progressBar, false)
-
-                // If this is the initial call, populate the terms spinner
-                if (dropDownOption == null) {
-                    this@AccountViewFragment.populateTermsSpinner()
-                }
-
-                // Filter out any transaction categories that shouldn't be shown
-                val unfilteredTransactionCategories = this@AccountViewFragment.accountActivity.getJSONArray("FormulaCategories")
-                val filteredTransactionCategories = JSONArray()
-                for (i in 0 until unfilteredTransactionCategories.length()) {
-                    val transactionCategory = unfilteredTransactionCategories.getJSONObject(i)
-                    if (transactionCategory.getBoolean("IsVisible")) {
-                        filteredTransactionCategories.put(transactionCategory)
-                    }
-                }
-                // Create the list adapter, and set it as the adapter for the main ExpandableListView
-                val transactionsListAdapter = AccountViewListViewAdapter(filteredTransactionCategories, activity!!.applicationContext)
-                val transactionsListView: ExpandableListView = this@AccountViewFragment.listItems.findViewById(R.id.transactions_list)
-                transactionsListView.setAdapter(transactionsListAdapter)
-            }
         }
     }
 }
