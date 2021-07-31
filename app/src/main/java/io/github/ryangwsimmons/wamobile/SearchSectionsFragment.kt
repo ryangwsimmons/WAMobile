@@ -1,7 +1,13 @@
 package io.github.ryangwsimmons.wamobile
 
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog.OnDateSetListener
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog.OnTimeSetListener
+import com.wdullaer.materialdatetimepicker.date.DatePickerDialog
+import com.wdullaer.materialdatetimepicker.time.TimePickerDialog
 import android.content.Intent
+import android.content.res.Resources
 import android.os.Bundle
+import android.text.SpannableStringBuilder
 import androidx.fragment.app.Fragment
 import android.view.LayoutInflater
 import android.view.View
@@ -13,20 +19,20 @@ import kotlinx.android.synthetic.main.search_sections_filter_group.view.*
 import kotlinx.coroutines.*
 import kotlin.reflect.KFunction3
 
-class SearchSectionsFragment(private var session: WASession, private var actionBar: ActionBar, private var progressBar: View, private var crossFade: KFunction3<View, View, Boolean, Unit>) : Fragment() {
+class SearchSectionsFragment(private var session: WASession, private var actionBar: ActionBar, private var progressBar: View, private var crossFade: KFunction3<View, View, Boolean, Unit>) : Fragment(), OnDateSetListener, OnTimeSetListener {
 
-    //Create attribute for the list of items in the view
+    // Create attribute for the list of items in the view
     private lateinit var listItems: View
 
-    //Create attributes for the spinner array adapters
+    // Create attributes for the spinner array adapters
     private lateinit var termsAdapter: ArrayAdapter<DropdownOption>
     private lateinit var subjectAdapters: ArrayList<ArrayAdapter<DropdownOption>>
     private lateinit var courseLevelAdapters: ArrayList<ArrayAdapter<DropdownOption>>
-    private lateinit var timeAdapters: ArrayList<ArrayAdapter<DropdownOption>>
+    private lateinit var timeAdapter: ArrayAdapter<DropdownOption>
     private lateinit var locationAdapter: ArrayAdapter<DropdownOption>
     private lateinit var academicLevelAdapter: ArrayAdapter<DropdownOption>
 
-    //Create attributes for the spinners and edit texts where multiple spinners have the same options
+    // Create attributes for the spinners and edit texts where multiple spinners have the same options
     private lateinit var subjects: ArrayList<Spinner>
     private lateinit var courseLevels: ArrayList<Spinner>
     private lateinit var courseNums: ArrayList<EditText>
@@ -34,43 +40,43 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
     private lateinit var times: ArrayList<Spinner>
     private lateinit var days: ArrayList<CheckBox>
 
+    // Create attributes for the search sections options retrieved
+    private lateinit var searchSectionsData: SearchSectionsData
+
+    // Create attribute that determines the current date being selected
+    private var currentDateSelect: Int = 0
+
+    // Create attribute that determines the current time being selected
+    private var currentTimeSelect: Int = 0
+
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
-        //Set the title of the action bar
+    ): View {
+        // Set the title of the action bar
         actionBar.title = getString(R.string.sfs_title)
 
-        //Initialize the array adapter array lists
+        // Initialize the array adapter array lists
         this.subjectAdapters = ArrayList()
         this.courseLevelAdapters = ArrayList()
-        this.timeAdapters = ArrayList()
 
-        //Get the items in the fragment
+        // Get the items in the fragment
         this.listItems = inflater.inflate(R.layout.fragment_search_sections, container, false)
 
         //Create an error handler for the coroutine that will be executed to get the search sections filters
         val errorHandler = CoroutineExceptionHandler { _, error ->
             CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(activity!!.applicationContext, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity().applicationContext, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 if (error.message != null) {
-                    Toast.makeText(activity!!.applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireActivity().applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 }
             }
         }
 
-        //Launch a coroutine to get the search sections filters
+        // Launch a coroutine to get the search sections options
         CoroutineScope(errorHandler).launch {
-            //Create ArrayLists for all the dropdown options
-            val terms: ArrayList<DropdownOption> = ArrayList()
-            val subjects: ArrayList<DropdownOption> = ArrayList()
-            val courseLevels: ArrayList<DropdownOption> = ArrayList()
-            val timesList: ArrayList<DropdownOption> = ArrayList()
-            val locations: ArrayList<DropdownOption> = ArrayList()
-            val academicLevels: ArrayList<DropdownOption> = ArrayList()
-
             //Populate all the ArrayLists with the options
-            this@SearchSectionsFragment.session.getSearchSectionsFilterValues(terms, subjects, courseLevels, timesList, locations, academicLevels)
+            this@SearchSectionsFragment.searchSectionsData = this@SearchSectionsFragment.session.getSearchSectionsFilterValues()
 
             withContext(Dispatchers.Main) {
                 //Initialize all the adapters and spinners
@@ -81,214 +87,209 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
                 this@SearchSectionsFragment.times = ArrayList()
                 this@SearchSectionsFragment.days = ArrayList()
 
-                this@SearchSectionsFragment.initializeAdapters(terms, subjects, courseLevels, timesList, locations, academicLevels)
-                crossFade(activity!!.findViewById(R.id.fragment_container), progressBar, false)
+                this@SearchSectionsFragment.initializeAdapters()
+                crossFade(requireActivity().findViewById(R.id.fragment_container), progressBar, false)
             }
         }
 
-        //Set up a listener for the "submit" button
-        listItems.findViewById<Button>(R.id.button_submitSearch).setOnClickListener { v: View ->
-            if ((listItems.findViewById<Spinner>(R.id.spinner_terms).selectedItem as DropdownOption).value == "") {
-                Toast.makeText(activity!!.applicationContext, getString(R.string.sfs_no_term_selected), Toast.LENGTH_SHORT).show()
-            } else if (this.countFilledFields() < 2) {
-                Toast.makeText(activity!!.applicationContext, getString(R.string.sfs_not_enough_fields), Toast.LENGTH_SHORT).show()
-            } else {
-                //Create an intent to start the search results activity
-                val intent = Intent(activity!!.applicationContext, SearchResultsActivity::class.java).apply {
-                    //Create a bundle for passing data to the new activity, and add the data to it
-                    val bundle: Bundle = Bundle()
+        // Set up listeners for date selects
+        listItems.findViewById<EditText>(R.id.editText_meetingStartDate).setOnClickListener(EditDateOnClickListener())
+        listItems.findViewById<EditText>(R.id.editText_meetingStartDate).onFocusChangeListener = EditDateOnFocusChangeListener()
 
-                    bundle.putParcelable("session", this@SearchSectionsFragment.session)
-                    bundle.putString("term", (this@SearchSectionsFragment.listItems.findViewById<Spinner>(R.id.spinner_terms).selectedItem as DropdownOption).value)
-                    bundle.putStringArrayList("subjects", ArrayList<String>(this@SearchSectionsFragment.subjects.map { subject: Spinner -> (subject.selectedItem as DropdownOption).value }))
-                    bundle.putStringArrayList("courseLevels", ArrayList<String>(this@SearchSectionsFragment.courseLevels.map { courseLevel: Spinner -> (courseLevel.selectedItem as DropdownOption).value }))
-                    bundle.putStringArrayList("courseNums", ArrayList<String>(this@SearchSectionsFragment.courseNums.map { courseNum: EditText -> courseNum.text.toString() }))
-                    bundle.putStringArrayList("sections", ArrayList<String>(this@SearchSectionsFragment.sections.map { section: EditText -> section.text.toString() }))
-                    bundle.putStringArrayList("times", ArrayList<String>(this@SearchSectionsFragment.times.map { time: Spinner -> (time.selectedItem as DropdownOption).value }))
-                    bundle.putBooleanArray("days", this@SearchSectionsFragment.days.map { day: CheckBox -> day.isChecked }.toBooleanArray())
-                    bundle.putString("courseKeywords", this@SearchSectionsFragment.listItems.findViewById<EditText>(R.id.editText_courseKeywords).text.toString())
-                    bundle.putString("location", (this@SearchSectionsFragment.listItems.findViewById<Spinner>(R.id.spinner_location).selectedItem as DropdownOption).value)
-                    bundle.putString("academicLevel", (this@SearchSectionsFragment.listItems.findViewById<Spinner>(R.id.spinner_academicLevel).selectedItem as DropdownOption).value)
-                    bundle.putString("instructorsLastName", this@SearchSectionsFragment.listItems.findViewById<EditText>(R.id.editText_instructorsLastName).text.toString())
+        listItems.findViewById<EditText>(R.id.editText_meetingEndDate).setOnClickListener(EditDateOnClickListener())
+        listItems.findViewById<EditText>(R.id.editText_meetingEndDate).onFocusChangeListener = EditDateOnFocusChangeListener()
 
-                    putExtra("bundle", bundle)
-                }
+        // Set up listeners for time selects
+        listItems.findViewById<EditText>(R.id.editText_timeStartsBy).setOnClickListener(EditTimeOnClickListener())
+        listItems.findViewById<EditText>(R.id.editText_timeStartsBy).onFocusChangeListener = EditTimeOnFocusChangeListener()
 
-                //Start the search results activity
-                startActivity(intent)
+        listItems.findViewById<EditText>(R.id.editText_timeEndsBy).setOnClickListener(EditTimeOnClickListener())
+        listItems.findViewById<EditText>(R.id.editText_timeEndsBy).onFocusChangeListener = EditTimeOnFocusChangeListener()
+
+        // Set up a listener for the "add" button
+        listItems.findViewById<Button>(R.id.button_addFilterGroup).setOnClickListener {
+            addFilterGroup(inflater)
+        }
+
+        // Set up a listener for the "submit" button
+        listItems.findViewById<Button>(R.id.button_submitSearch).setOnClickListener {
+            // Create an intent to start the search results activity
+            val intent = Intent(requireActivity().applicationContext, SearchResultsActivity::class.java).apply {
+                //Create a bundle for passing data to the new activity, and add the data to it
+                val bundle = Bundle()
+
+                bundle.putParcelable("session", this@SearchSectionsFragment.session)
+                bundle.putString("term", (this@SearchSectionsFragment.listItems.findViewById<Spinner>(R.id.spinner_terms).selectedItem as DropdownOption).value)
+                bundle.putStringArrayList("subjects", ArrayList<String>(this@SearchSectionsFragment.subjects.map { subject: Spinner -> (subject.selectedItem as DropdownOption).value }))
+                bundle.putStringArrayList("courseLevels", ArrayList<String>(this@SearchSectionsFragment.courseLevels.map { courseLevel: Spinner -> (courseLevel.selectedItem as DropdownOption).value }))
+                bundle.putStringArrayList("courseNums", ArrayList<String>(this@SearchSectionsFragment.courseNums.map { courseNum: EditText -> courseNum.text.toString() }))
+                bundle.putStringArrayList("sections", ArrayList<String>(this@SearchSectionsFragment.sections.map { section: EditText -> section.text.toString() }))
+                bundle.putStringArrayList("times", ArrayList<String>(this@SearchSectionsFragment.times.map { time: Spinner -> (time.selectedItem as DropdownOption).value }))
+                bundle.putBooleanArray("days", this@SearchSectionsFragment.days.map { day: CheckBox -> day.isChecked }.toBooleanArray())
+                bundle.putString("location", (this@SearchSectionsFragment.listItems.findViewById<Spinner>(R.id.spinner_location).selectedItem as DropdownOption).value)
+                bundle.putString("academicLevel", (this@SearchSectionsFragment.listItems.findViewById<Spinner>(R.id.spinner_academicLevel).selectedItem as DropdownOption).value)
+
+                putExtra("bundle", bundle)
             }
+
+            // Start the search results activity
+            startActivity(intent)
         }
 
         // Inflate the layout for this fragment
         return listItems
     }
 
-    private fun initializeAdapters(terms: ArrayList<DropdownOption>,
-                                   subjects: ArrayList<DropdownOption>,
-                                   courseLevels: ArrayList<DropdownOption>,
-                                   times: ArrayList<DropdownOption>,
-                                   locations: ArrayList<DropdownOption>,
-                                   academicLevels: ArrayList<DropdownOption>) {
-        //Initialize the terms adapter and spinner
-        this.termsAdapter = ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, terms)
+    private fun initializeAdapters() {
+        // Initialize the terms adapter and spinner
+        this.termsAdapter = ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_dropdown_item, this.searchSectionsData.terms)
         this.listItems.findViewById<Spinner>(R.id.spinner_terms).adapter = this.termsAdapter
 
-        //Initialize the subject adapters and spinners
-        this.subjectAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
-        this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup1).spinner_subject.adapter = this.subjectAdapters[0]
-        this.subjects.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup1).spinner_subject)
+        // Initialize all of the filter groups
+        val filterGroups = this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroups)
+        for(i in 0 until filterGroups.childCount) {
+            val filterGroup = filterGroups.getChildAt(i)
 
-        this.subjectAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
-        this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup2).spinner_subject.adapter = this.subjectAdapters[1]
-        this.subjects.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup2).spinner_subject)
+            // Initialize subjects spinner
+            val subjectsAdapter = ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_dropdown_item, this.searchSectionsData.subjects)
+            val subjectsSpinner = filterGroup.findViewById<Spinner>(R.id.spinner_subject)
+            subjectsSpinner.adapter = subjectsAdapter
+            this.subjects.add(subjectsSpinner)
 
-        this.subjectAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
-        this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup3).spinner_subject.adapter = this.subjectAdapters[2]
-        this.subjects.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup3).spinner_subject)
+            // Initialize course number text field
+            val courseNumEditText = filterGroup.findViewById<EditText>(R.id.editText_courseNum)
+            this.courseNums.add(courseNumEditText)
 
-        this.subjectAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
-        this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup4).spinner_subject.adapter = this.subjectAdapters[3]
-        this.subjects.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup4).spinner_subject)
+            // Initialize section text field
+            val courseSectionEditText = filterGroup.findViewById<EditText>(R.id.editText_section)
+            this.sections.add(courseSectionEditText)
+        }
 
-        this.subjectAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, subjects))
-        this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup5).spinner_subject.adapter = this.subjectAdapters[4]
-        this.subjects.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup5).spinner_subject)
+        this.timeAdapter = ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_dropdown_item, this.searchSectionsData.meetingTimes)
+        this.listItems.findViewById<Spinner>(R.id.spinner_timeOfDay).adapter = this.timeAdapter
+        this.times.add(this.listItems.findViewById(R.id.spinner_timeOfDay))
 
-        //Initialize the course level adapters and spinners
-        this.courseLevelAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
-        this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup1).spinner_courseLevel.adapter = this.courseLevelAdapters[0]
-        this.courseLevels.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup1).spinner_courseLevel)
+        // Initialize the checkboxes for days
+        val daysCheckboxes = this.listItems.findViewById<LinearLayout>(R.id.days_checkboxes)
+        for (i in 0 until daysCheckboxes.childCount) {
+            val checkboxLayout = daysCheckboxes.getChildAt(i) as LinearLayout
+            val checkBox = checkboxLayout.getChildAt(0) as CheckBox
 
-        this.courseLevelAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
-        this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup2).spinner_courseLevel.adapter = this.courseLevelAdapters[1]
-        this.courseLevels.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup2).spinner_courseLevel)
+            this.days.add(checkBox)
+        }
 
-        this.courseLevelAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
-        this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup3).spinner_courseLevel.adapter = this.courseLevelAdapters[2]
-        this.courseLevels.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup3).spinner_courseLevel)
-
-        this.courseLevelAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
-        this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup4).spinner_courseLevel.adapter = this.courseLevelAdapters[3]
-        this.courseLevels.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup4).spinner_courseLevel)
-
-        this.courseLevelAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, courseLevels))
-        this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup5).spinner_courseLevel.adapter = this.courseLevelAdapters[4]
-        this.courseLevels.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup5).spinner_courseLevel)
-
-        //Initialize the edit texts that involve course numbers
-        this.courseNums.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup1).editText_courseNum)
-
-        this.courseNums.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup2).editText_courseNum)
-
-        this.courseNums.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup3).editText_courseNum)
-
-        this.courseNums.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup4).editText_courseNum)
-
-        this.courseNums.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup5).editText_courseNum)
-
-        //Initialize the edit texts that involve course sections
-        this.sections.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup1).editText_section)
-
-        this.sections.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup2).editText_section)
-
-        this.sections.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup3).editText_section)
-
-        this.sections.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup4).editText_section)
-
-        this.sections.add(this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroup5).editText_section)
-
-        //Initialize the adapters and spinners that involve times
-        this.timeAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, times))
-        this.listItems.findViewById<Spinner>(R.id.spinner_meetingAfter).adapter = this.timeAdapters[0]
-        this.times.add(this.listItems.findViewById(R.id.spinner_meetingAfter))
-
-        this.timeAdapters.add(ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, times))
-        this.listItems.findViewById<Spinner>(R.id.spinner_endingBefore).adapter = this.timeAdapters[1]
-        this.times.add(this.listItems.findViewById(R.id.spinner_endingBefore))
-
-        //Initialize the checkboxes for days
-        this.days.add(this.listItems.findViewById<CheckBox>(R.id.days_checkboxes).checkbox_mon)
-
-        this.days.add(this.listItems.findViewById<CheckBox>(R.id.days_checkboxes).checkbox_tue)
-
-        this.days.add(this.listItems.findViewById<CheckBox>(R.id.days_checkboxes).checkbox_wed)
-
-        this.days.add(this.listItems.findViewById<CheckBox>(R.id.days_checkboxes).checkbox_thu)
-
-        this.days.add(this.listItems.findViewById<CheckBox>(R.id.days_checkboxes).checkbox_fri)
-
-        this.days.add(this.listItems.findViewById<CheckBox>(R.id.days_checkboxes).checkbox_sat)
-
-        this.days.add(this.listItems.findViewById<CheckBox>(R.id.days_checkboxes).checkbox_sun)
-
-        //Initialize the location adapter and spinner
-        this.locationAdapter = ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, locations)
+        // Initialize the location adapter and spinner
+        this.locationAdapter = ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_dropdown_item, this.searchSectionsData.locations)
         this.listItems.findViewById<Spinner>(R.id.spinner_location).adapter = this.locationAdapter
 
-        //Initialize the academic level adapter and spinner
-        this.academicLevelAdapter = ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, academicLevels)
+        // Initialize the academic level adapter and spinner
+        this.academicLevelAdapter = ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_dropdown_item, this.searchSectionsData.academicLevels)
         this.listItems.findViewById<Spinner>(R.id.spinner_academicLevel).adapter = this.academicLevelAdapter
     }
 
-    private fun countFilledFields(): Int {
-        //Count the number of filled fields
-        var filledFieldCount = 0
-        if ((listItems.findViewById<Spinner>(R.id.spinner_terms).selectedItem as DropdownOption).value != "") {
-            ++filledFieldCount
+    override fun onDateSet(
+        view: DatePickerDialog?,
+        year: Int,
+        monthOfYear: Int,
+        dayOfMonth: Int
+    ) {
+        val editText = this@SearchSectionsFragment.listItems.findViewById<EditText>(this.currentDateSelect)
+
+        editText.text = SpannableStringBuilder("%02d/%02d/%d".format(monthOfYear + 1, dayOfMonth, year))
+    }
+
+    override fun onTimeSet(view: TimePickerDialog?, hourOfDay: Int, minute: Int, second: Int) {
+        val editText = this@SearchSectionsFragment.listItems.findViewById<EditText>(this.currentTimeSelect)
+
+        val twelveHourAdjustedHour: Int
+        val amOrPm: String
+
+        if (hourOfDay >= 12) {
+            twelveHourAdjustedHour = if (hourOfDay > 12) {
+                hourOfDay - 12
+            } else {
+                hourOfDay
+            }
+
+            amOrPm = "PM"
+        } else {
+            twelveHourAdjustedHour = if (hourOfDay == 0) {
+                12
+            } else {
+                hourOfDay
+            }
+            amOrPm = "AM"
         }
 
-        for (subject: Spinner in this.subjects) {
-            if ((subject.selectedItem as DropdownOption).value != "") {
-                ++filledFieldCount
+        editText.text = SpannableStringBuilder("%02d:%02d %s".format(twelveHourAdjustedHour, minute, amOrPm))
+    }
+
+    private inner class EditDateOnClickListener: View.OnClickListener {
+        override fun onClick(v: View?) {
+            this@SearchSectionsFragment.currentDateSelect = v!!.id
+            val datePickerDialog = DatePickerDialog.newInstance(this@SearchSectionsFragment)
+            datePickerDialog.show(this@SearchSectionsFragment.parentFragmentManager, "DatePickerDialog")
+        }
+    }
+
+    private inner class EditDateOnFocusChangeListener: View.OnFocusChangeListener {
+        override fun onFocusChange(v: View?, hasFocus: Boolean) {
+            if (hasFocus) {
+                this@SearchSectionsFragment.currentDateSelect = v!!.id
+                val datePickerDialog = DatePickerDialog.newInstance(this@SearchSectionsFragment)
+                datePickerDialog.show(this@SearchSectionsFragment.parentFragmentManager, "DatePickerDialog")
             }
         }
+    }
 
-        for (courseLevel: Spinner in this.courseLevels) {
-            if ((courseLevel.selectedItem as DropdownOption).value != "") {
-                ++filledFieldCount
+    private inner class EditTimeOnClickListener: View.OnClickListener {
+        override fun onClick(v: View?) {
+            this@SearchSectionsFragment.currentTimeSelect = v!!.id
+            val timePickerDialog = TimePickerDialog.newInstance(this@SearchSectionsFragment, false)
+            timePickerDialog.show(this@SearchSectionsFragment.parentFragmentManager, "TimePickerDialog")
+        }
+    }
+
+    private inner class EditTimeOnFocusChangeListener: View.OnFocusChangeListener {
+        override fun onFocusChange(v: View?, hasFocus: Boolean) {
+            if (hasFocus) {
+                this@SearchSectionsFragment.currentTimeSelect = v!!.id
+                val timePickerDialog = TimePickerDialog.newInstance(this@SearchSectionsFragment, false)
+                timePickerDialog.show(this@SearchSectionsFragment.parentFragmentManager, "TimePickerDialog")
             }
         }
+    }
 
-        for (courseNum: EditText in this.courseNums) {
-            if (courseNum.text.toString() != "") {
-                ++filledFieldCount
-            }
-        }
+    private fun addFilterGroup(inflater: LayoutInflater) {
+        // Get the filter groups view
+        val filterGroups = this.listItems.findViewById<LinearLayout>(R.id.searchSections_filterGroups)
 
-        for (section: EditText in this.sections) {
-            if (section.text.toString() != "") {
-                ++filledFieldCount
-            }
-        }
+        // Get the filter groups layout
+        val filterGroup = inflater.inflate(R.layout.search_sections_filter_group, filterGroups, false)
 
-        for (time: Spinner in this.times) {
-            if ((time.selectedItem as DropdownOption).value != "") {
-                ++filledFieldCount
-            }
-        }
+        // Create an object for the layout params
+        fun dpToPx(dp: Int): Int = (dp * Resources.getSystem().displayMetrics.density).toInt()
+        val layoutParams = LinearLayout.LayoutParams(LinearLayout.LayoutParams.MATCH_PARENT, LinearLayout.LayoutParams.WRAP_CONTENT)
+        layoutParams.setMargins(dpToPx(25), dpToPx(20), dpToPx(25), 0)
 
-        for (day: CheckBox in this.days) {
-            if (day.isChecked) {
-                ++filledFieldCount
-            }
-        }
+        // Set the filter group params
+        filterGroup.layoutParams = layoutParams
 
-        if (listItems.findViewById<EditText>(R.id.editText_courseKeywords).text.toString() != "") {
-            ++filledFieldCount
-        }
+        // Add the subjects data to the spinner and initialize it
+        val subjectsAdapter = ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_dropdown_item, this.searchSectionsData.subjects)
+        val subjectsSpinner = filterGroup.findViewById<Spinner>(R.id.spinner_subject)
+        subjectsSpinner.adapter = subjectsAdapter
+        this.subjects.add(subjectsSpinner)
 
-        if ((listItems.findViewById<Spinner>(R.id.spinner_location).selectedItem as DropdownOption).value != "") {
-            ++filledFieldCount
-        }
+        // Initialize the course number text field
+        val courseNumEditText = filterGroup.findViewById<EditText>(R.id.editText_courseNum)
+        this.courseNums.add(courseNumEditText)
 
-        if ((listItems.findViewById<Spinner>(R.id.spinner_academicLevel).selectedItem as DropdownOption).value != "") {
-            ++filledFieldCount
-        }
+        // Initialize the section text field
+        val sectionNumEditText = filterGroup.findViewById<EditText>(R.id.editText_section)
+        this.sections.add(sectionNumEditText)
 
-        if (listItems.findViewById<EditText>(R.id.editText_instructorsLastName).text.toString() != "") {
-            ++filledFieldCount
-        }
-
-        return filledFieldCount
+        // Add the filter group to the filter groups view
+        filterGroups.addView(filterGroup)
     }
 }

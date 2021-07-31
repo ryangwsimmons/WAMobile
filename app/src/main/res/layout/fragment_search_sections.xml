@@ -34,74 +34,109 @@
                 android:layout_marginStart="8dp" />
         </RelativeLayout>
 
-        <include
-            layout="@layout/search_sections_filter_group"
-            android:id="@+id/searchSections_filterGroup1"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginEnd="25dp"
-            android:layout_marginTop="20dp" />
-
-        <include
-            layout="@layout/search_sections_filter_group"
-            android:id="@+id/searchSections_filterGroup2"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginEnd="25dp"
-            android:layout_marginTop="20dp" />
-
-        <include
-            layout="@layout/search_sections_filter_group"
-            android:id="@+id/searchSections_filterGroup3"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginEnd="25dp"
-            android:layout_marginTop="20dp" />
-
-        <include
-            layout="@layout/search_sections_filter_group"
-            android:id="@+id/searchSections_filterGroup4"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginEnd="25dp"
-            android:layout_marginTop="20dp" />
-
-        <include
-            layout="@layout/search_sections_filter_group"
-            android:id="@+id/searchSections_filterGroup5"
-            android:layout_width="fill_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="25dp"
-            android:layout_marginEnd="25dp"
-            android:layout_marginTop="20dp" />
-
         <RelativeLayout
-            android:layout_width="fill_parent"
+            android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginTop="20dp"
+            android:layout_marginTop="10dp"
             android:layout_marginStart="16dp"
             android:layout_marginEnd="16dp">
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView_meetingAfter"
+                android:id="@+id/textView_meetingStartDate"
+                android:layout_toStartOf="@id/editText_meetingStartDate_wrapper"
+                android:layout_alignTop="@id/editText_meetingStartDate_wrapper"
+                android:layout_alignBottom="@id/editText_meetingStartDate_wrapper"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@id/spinner_meetingAfter"
+                android:gravity="center_vertical"
                 android:textSize="18sp"
-                android:text="@string/search_sections_meetingAfter" />
+                android:text="@string/search_sections_meetingStartDate" />
 
-            <Spinner
-                android:layout_width="160dp"
+            <RelativeLayout
+                android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/spinner_meetingAfter"
+                android:id="@+id/editText_meetingStartDate_wrapper"
                 android:layout_alignParentEnd="true"
-                android:layout_alignTop="@id/textView_meetingAfter"
-                android:layout_alignBottom="@id/textView_meetingAfter" />
+                android:background="@color/design_default_color_background">
+                <EditText
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/editText_meetingStartDate"
+                    android:inputType="none"
+                    android:editable="false"
+                    android:focusable="false"
+                    android:textSize="14sp"
+                    android:hint="@string/search_sections_dateHint"
+                    android:importantForAutofill="no"
+                    tools:ignore="Deprecated,TextFields" />
+            </RelativeLayout>
         </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_meetingEndDate"
+                android:labelFor="@id/editText_meetingEndDate"
+                android:layout_toStartOf="@id/editText_meetingEndDate_wrapper"
+                android:layout_alignTop="@id/editText_meetingEndDate_wrapper"
+                android:layout_alignBottom="@id/editText_meetingEndDate_wrapper"
+                android:layout_alignParentStart="true"
+                android:gravity="center_vertical"
+                android:textSize="18sp"
+                android:text="@string/search_sections_meetingEndDate" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText_meetingEndDate_wrapper"
+                android:layout_alignParentEnd="true"
+                android:background="@color/design_default_color_background">
+                <EditText
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/editText_meetingEndDate"
+                    android:inputType="none"
+                    android:editable="false"
+                    android:focusable="false"
+                    android:textSize="14sp"
+                    android:hint="@string/search_sections_dateHint"
+                    android:importantForAutofill="no"
+                    tools:ignore="Deprecated,TextFields" />
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:orientation="vertical"
+            android:id="@+id/searchSections_filterGroups">
+
+            <include
+                layout="@layout/search_sections_filter_group"
+                android:layout_width="fill_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="25dp"
+                android:layout_marginEnd="25dp"
+                android:layout_marginTop="20dp" />
+
+        </LinearLayout>
+
+        <Button
+            android:layout_width="120dp"
+            android:layout_height="wrap_content"
+            android:id="@+id/button_addFilterGroup"
+            android:layout_marginTop="15dp"
+            android:layout_marginBottom="20dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp"
+            android:text="@string/search_sections_addFilterGroup"
+            android:drawableStart="@drawable/ic_baseline_add_24"/>
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -112,19 +147,97 @@
             <TextView
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/textView_endingBefore"
+                android:id="@+id/textView_timeOfDay"
                 android:layout_alignParentStart="true"
-                android:layout_toStartOf="@id/spinner_endingBefore"
+                android:layout_toStartOf="@id/spinner_timeOfDay"
                 android:textSize="18sp"
-                android:text="@string/search_sections_endingBefore" />
+                android:text="@string/search_sections_timeOfDay" />
 
             <Spinner
                 android:layout_width="160dp"
                 android:layout_height="wrap_content"
-                android:id="@+id/spinner_endingBefore"
+                android:id="@+id/spinner_timeOfDay"
                 android:layout_alignParentEnd="true"
-                android:layout_alignTop="@id/textView_endingBefore"
-                android:layout_alignBottom="@id/textView_endingBefore" />
+                android:layout_alignTop="@id/textView_timeOfDay"
+                android:layout_alignBottom="@id/textView_timeOfDay" />
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_timeStartsBy"
+                android:labelFor="@id/editText_timeStartsBy"
+                android:layout_toStartOf="@id/editText_timeStartsBy_wrapper"
+                android:layout_alignTop="@id/editText_timeStartsBy_wrapper"
+                android:layout_alignBottom="@id/editText_timeStartsBy_wrapper"
+                android:layout_alignParentStart="true"
+                android:gravity="center_vertical"
+                android:textSize="18sp"
+                android:text="@string/search_sections_timeStartsBy" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText_timeStartsBy_wrapper"
+                android:layout_alignParentEnd="true"
+                android:background="@color/design_default_color_background">
+                <EditText
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/editText_timeStartsBy"
+                    android:inputType="none"
+                    android:editable="false"
+                    android:focusable="false"
+                    android:textSize="14sp"
+                    android:hint="@string/search_sections_timeHint"
+                    android:importantForAutofill="no"
+                    tools:ignore="Deprecated" />
+            </RelativeLayout>
+        </RelativeLayout>
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="10dp"
+            android:layout_marginStart="16dp"
+            android:layout_marginEnd="16dp">
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/textView_timeEndsBy"
+                android:labelFor="@id/editText_timeEndsBy"
+                android:layout_toStartOf="@id/editText_timeEndsBy_wrapper"
+                android:layout_alignTop="@id/editText_timeEndsBy_wrapper"
+                android:layout_alignBottom="@id/editText_timeEndsBy_wrapper"
+                android:layout_alignParentStart="true"
+                android:gravity="center_vertical"
+                android:textSize="18sp"
+                android:text="@string/search_sections_timeEndsBy" />
+
+            <RelativeLayout
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:id="@+id/editText_timeEndsBy_wrapper"
+                android:layout_alignParentEnd="true"
+                android:background="@color/design_default_color_background">
+                <EditText
+                    android:layout_width="160dp"
+                    android:layout_height="wrap_content"
+                    android:id="@+id/editText_timeEndsBy"
+                    android:inputType="none"
+                    android:editable="false"
+                    android:focusable="false"
+                    android:textSize="14sp"
+                    android:hint="@string/search_sections_timeHint"
+                    android:importantForAutofill="no"
+                    tools:ignore="Deprecated" />
+            </RelativeLayout>
         </RelativeLayout>
 
         <include
@@ -133,31 +246,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginTop="20dp" />
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="20dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/textView_courseKeywords"
-                android:labelFor="@id/editText_courseKeywords"
-                android:layout_alignTop="@id/editText_courseKeywords"
-                android:layout_alignBottom="@id/editText_courseKeywords"
-                android:gravity="center_vertical"
-                android:textSize="18sp"
-                android:text="@string/search_sections_courseKeywords" />
-
-            <EditText
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/editText_courseKeywords"
-                android:inputType="text"
-                android:layout_toEndOf="@id/textView_courseKeywords"
-                android:layout_marginStart="8dp"
-                android:importantForAutofill="no" />
-        </RelativeLayout>
 
         <RelativeLayout
             android:layout_width="fill_parent"
@@ -205,33 +293,6 @@
                 android:layout_alignParentEnd="true"
                 android:layout_alignTop="@id/textView_academicLevel"
                 android:layout_alignBottom="@id/textView_academicLevel" />
-        </RelativeLayout>
-
-        <RelativeLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="10dp"
-            android:layout_marginStart="16dp"
-            android:layout_marginEnd="16dp">
-            <TextView
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/textView_instructorsLastName"
-                android:labelFor="@id/editText_instructorsLastName"
-                android:layout_alignTop="@id/editText_instructorsLastName"
-                android:layout_alignBottom="@id/editText_instructorsLastName"
-                android:gravity="center_vertical"
-                android:textSize="18sp"
-                android:text="@string/search_sections_instructorsLastName" />
-
-            <EditText
-                android:layout_width="150dp"
-                android:layout_height="wrap_content"
-                android:id="@+id/editText_instructorsLastName"
-                android:inputType="text"
-                android:layout_toEndOf="@id/textView_instructorsLastName"
-                android:layout_marginStart="8dp"
-                android:importantForAutofill="no" />
         </RelativeLayout>
 
         <Button

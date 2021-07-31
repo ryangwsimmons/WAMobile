@@ -35,12 +35,18 @@
 
     <string name="sfs_title">Search for Sections</string>
     <string name="search_sections_term">Term:</string>
+    <string name="search_sections_dateHint">M/d/yyyy</string>
+    <string name="search_sections_meetingStartDate">Meeting Start Date:</string>
+    <string name="search_sections_meetingEndDate">Meeting End Date:</string>
     <string name="search_sections_subject">Subject:</string>
     <string name="search_sections_courseLevel">Course Level:</string>
     <string name="search_sections_courseNum">Course Number:</string>
+    <string name="search_sections_addFilterGroup">Add</string>
     <string name="search_sections_section">Section:</string>
-    <string name="search_sections_meetingAfter">Sections Meeting After:</string>
-    <string name="search_sections_endingBefore">Sections Ending Before:</string>
+    <string name="search_sections_timeOfDay">Time Of Day:</string>
+    <string name="search_sections_timeHint">hh:mm AM/PM</string>
+    <string name="search_sections_timeStartsBy">Time Starts By:</string>
+    <string name="search_sections_timeEndsBy">Time Ends By:</string>
     <string name="search_sections_courseKeywords">Course Title Keyword(s):</string>
     <string name="search_sections_location">Location:</string>
     <string name="search_sections_academicLevel">Academic Level:</string>

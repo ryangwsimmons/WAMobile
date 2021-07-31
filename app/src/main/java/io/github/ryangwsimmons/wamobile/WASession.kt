@@ -5,6 +5,7 @@ package io.github.ryangwsimmons.wamobile
 import android.annotation.SuppressLint
 import android.os.Parcelable
 import kotlinx.android.parcel.Parcelize
+import org.json.JSONObject
 import org.jsoup.Connection.Method
 import org.jsoup.Connection.Response
 import org.jsoup.Jsoup
@@ -274,94 +275,61 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    fun getSearchSectionsFilterValues(terms: ArrayList<DropdownOption>,
-                                      subjects: ArrayList<DropdownOption>,
-                                      courseLevels: ArrayList<DropdownOption>,
-                                      times: ArrayList<DropdownOption>,
-                                      locations: ArrayList<DropdownOption>,
-                                      academicLevels: ArrayList<DropdownOption>) {
-        //Check that a connection has been initialized
-        if (this.homeCookies.isEmpty()) {
-            throw Exception("Error: The connection has not yet been initialized.")
+    fun getSearchSectionsFilterValues(): SearchSectionsData {
+        // Make a request to the Catalog Advanced Search options endpoint
+        val res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Courses/GetCatalogAdvancedSearchAsync")
+            .ignoreContentType(true)
+            .execute()
+
+        // Parse the request JSON
+        val dataJson = JSONObject(res.body())
+
+        // Create a new SearchSectionsData object to hold the response data
+        val searchSectionsData = SearchSectionsData()
+
+        // Parse the subjects array to get all available subjects
+        val subjectsArray = dataJson.getJSONArray("Subjects")
+        for (i in 0 until subjectsArray.length()) {
+            val subjectJson = subjectsArray.getJSONObject(i)
+            if (subjectJson.getBoolean("ShowInCourseSearch")) {
+                searchSectionsData.subjects.add(DropdownOption(subjectJson.getString("Description"), subjectJson.getString("Code")))
+            }
         }
 
-        //Connect to the WebAdvisor search for sections filter page, and get the response
-        val res: Response = this.getSearchSectionsResponse()
-
-        //Parse the resulting document's HTML
-        val doc: Document = res.parse()
-
-        //Get the list of terms
-        for (term: Element in doc.getElementById("VAR1").getElementsByTag("option")) {
-            //Get the name of the term option
-            val name: String = term.text()
-
-            //Get the value of the term option
-            val value: String = term.attr("value")
-
-            //Add the term option to the ArrayList of terms
-            terms.add(DropdownOption(name, value))
+        // Parse the terms array to get all available terms
+        val termsArray = dataJson.getJSONArray("Terms")
+        for (i in 0 until termsArray.length()) {
+            val termJson = termsArray.getJSONObject(i)
+            searchSectionsData.terms.add(DropdownOption(termJson.getString("Item2"), termJson.getString("Item1")))
         }
 
-        //Get the list of subjects
-        for (subject: Element in doc.getElementById("LIST_VAR1_1").getElementsByTag("option")) {
-            //Get the name of the subject option
-            val name: String = subject.text()
-
-            //Get the value of the subject option
-            val value: String = subject.attr("value")
-
-            //Add the subject option to the ArrayList of subjects
-            subjects.add(DropdownOption(name, value))
+        // Parse the locations array to get all available locations
+        val locationsArray = dataJson.getJSONArray("Locations")
+        for (i in 0 until locationsArray.length()) {
+            val locationJson = locationsArray.getJSONObject(i)
+            searchSectionsData.locations.add(DropdownOption(locationJson.getString("Item2"), locationJson.getString("Item1")))
         }
 
-        //Get the list of course levels
-        for (courseLevel: Element in doc.getElementById("LIST_VAR2_1").getElementsByTag("option")) {
-            //Get the name of the course level option
-            val name: String = courseLevel.text()
-
-            //Get the value of the course level option
-            val value: String = courseLevel.attr("value")
-
-            //Add the course level option to the ArrayList of course levels
-            courseLevels.add(DropdownOption(name, value))
+        // Parse the academic levels array to get all available academic levels
+        val academicLevelsArray = dataJson.getJSONArray("AcademicLevels")
+        for (i in 0 until academicLevelsArray.length()) {
+            val academicLevelJson = academicLevelsArray.getJSONObject(i)
+            searchSectionsData.academicLevels.add(DropdownOption(academicLevelJson.getString("Item2"), academicLevelJson.getString("Item1")))
         }
 
-        //Get the list of times
-        for (time: Element in doc.getElementById("VAR7").getElementsByTag("option")) {
-            //Get the name of the time option
-            val name: String = time.text()
-
-            //Get the value of the time option
-            val value: String = time.attr("value")
-
-            //Add the time option to the ArrayList of times
-            times.add(DropdownOption(name, value))
+        // Parse the meeting times array to get all available meeting times
+        val meetingTimesArray = dataJson.getJSONArray("TimeRanges")
+        for (i in 0 until meetingTimesArray.length()) {
+            val meetingTimeJson = meetingTimesArray.getJSONObject(i)
+            val beginningTime = meetingTimeJson.getInt("Item2")
+            val endTime = meetingTimeJson.getInt("Item3")
+            searchSectionsData.meetingTimes.add(DropdownOption(
+                meetingTimeJson.getString("Item1"),
+                "$beginningTime,$endTime"
+            ))
         }
 
-        //Get the list of locations
-        for (location: Element in doc.getElementById("VAR6").getElementsByTag("option")) {
-            //Get the name of the location option
-            val name: String = location.text()
-
-            //Get the value of the location option
-            val value: String = location.attr("value")
-
-            //Add the location option to the ArrayList of locations
-            locations.add(DropdownOption(name, value))
-        }
-
-        //Get the list of academic levels
-        for (academicLevel: Element in doc.getElementById("VAR21").getElementsByTag("option")) {
-            //Get the name of the academic level option
-            val name: String = academicLevel.text()
-
-            //Get the value of the academic level option
-             val value: String = academicLevel.attr("value")
-
-            //Add the academic level option to the ArrayList of academic levels
-            academicLevels.add(DropdownOption(name, value))
-        }
+        return searchSectionsData
     }
 
     private fun formatMeeting(meetingString: String): String {
