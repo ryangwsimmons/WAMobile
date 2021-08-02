@@ -7,6 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.*
 import androidx.appcompat.app.ActionBar
+import io.github.ryangwsimmons.wamobile.databinding.FragmentAccountViewBinding
 import kotlinx.coroutines.*
 import org.json.JSONException
 import org.json.JSONObject
@@ -27,24 +28,28 @@ class AccountViewFragment(private var session: WASession, private var actionBar:
     private val allTerms: ArrayList<AccountViewTerm> = ArrayList<AccountViewTerm>()
 
     // The items in the fragment, allows content to be updated later if necessary
-    private lateinit var listItems: View
+    private lateinit var viewModel: View
+
+    private var _binding: FragmentAccountViewBinding? = null
+    private val binding get() = _binding!!
 
     override fun onCreateView(
-        inflater: LayoutInflater, container: ViewGroup?,
+        inflater: LayoutInflater,
+        container: ViewGroup?,
         savedInstanceState: Bundle?
     ): View {
+        _binding = FragmentAccountViewBinding.inflate(inflater, container, false)
+        val viewModel = binding.root
+
         //Set the title of the action bar
         actionBar.title = getString(R.string.accountView_title)
-
-        //Get the items in the fragment
-        this.listItems = inflater.inflate(R.layout.fragment_account_view, container, false)
 
         //Create an error handler for the coroutine that will be executed to get the account info
         val errorHandler = CoroutineExceptionHandler { _, error ->
             CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(activity!!.applicationContext, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity().applicationContext, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 if (error.message != null) {
-                    Toast.makeText(activity!!.applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireActivity().applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 }
             }
         }
@@ -59,23 +64,28 @@ class AccountViewFragment(private var session: WASession, private var actionBar:
         }
 
         // Inflate the layout for this fragment
-        return listItems
+        return viewModel
+    }
+
+    override fun onDestroyView() {
+        super.onDestroyView()
+        _binding = null
     }
 
     private fun getAccountViewInfo(dropDownOption: DropdownOption?) {
         //Create an error handler for the coroutine that will be executed to get the new account view info
         val errorHandler = CoroutineExceptionHandler { _, error ->
             CoroutineScope(Dispatchers.Main).launch {
-                Toast.makeText(activity!!.applicationContext, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
+                Toast.makeText(requireActivity().applicationContext, error.message ?: getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 if (error.message != null) {
-                    Toast.makeText(activity!!.applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
+                    Toast.makeText(requireActivity().applicationContext, getString(R.string.network_error), Toast.LENGTH_LONG).show()
                 }
             }
         }
 
         // Start a cross-fade while the data is being retrieved, if one does not already exist
         if (dropDownOption != null) {
-            crossFade(progressBar, activity!!.findViewById(R.id.fragment_container), false)
+            crossFade(progressBar, requireActivity().findViewById(R.id.fragment_container), false)
         }
 
         //Launch a coroutine to get the account view
@@ -87,7 +97,7 @@ class AccountViewFragment(private var session: WASession, private var actionBar:
             }
 
             withContext(Dispatchers.Main) {
-                crossFade(activity!!.findViewById(R.id.fragment_container), progressBar, false)
+                crossFade(requireActivity().findViewById(R.id.fragment_container), progressBar, false)
 
                 // Wrap the JSON data to native Kotlin objects
                 this@AccountViewFragment.wrapData(accountActivity)
@@ -98,14 +108,14 @@ class AccountViewFragment(private var session: WASession, private var actionBar:
                 }
 
                 // Set the balance
-                val balanceTextView = this@AccountViewFragment.listItems.findViewById<TextView>(R.id.textView_balance)
+                val balanceTextView = this@AccountViewFragment.binding.textViewBalance
                 val balanceFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
                 balanceFormat.currency = Currency.getInstance("CAD")
                 balanceTextView.text = balanceFormat.format(this@AccountViewFragment.currentTerm.balance)
 
                 // Create the list adapter, and set it as the adapter for the main ExpandableListView
-                val transactionsListAdapter = AccountViewListViewAdapter(this@AccountViewFragment.currentTerm.categories, activity!!.applicationContext)
-                val transactionsListView: ExpandableListView = this@AccountViewFragment.listItems.findViewById(R.id.transactions_list)
+                val transactionsListAdapter = AccountViewListViewAdapter(this@AccountViewFragment.currentTerm.categories, requireActivity().applicationContext)
+                val transactionsListView: ExpandableListView = this@AccountViewFragment.binding.transactionsList
                 transactionsListView.setAdapter(transactionsListAdapter)
             }
         }
@@ -200,10 +210,10 @@ class AccountViewFragment(private var session: WASession, private var actionBar:
             }
 
             // Create an adapter for the spinner
-            val termsAdapter = ArrayAdapter(activity!!, android.R.layout.simple_spinner_dropdown_item, terms)
+            val termsAdapter = ArrayAdapter(requireActivity(), android.R.layout.simple_spinner_dropdown_item, terms)
 
             // Set the adapter to the terms spinner in the fragment's view
-            val termsSpinner = this.listItems.findViewById<Spinner>(R.id.spinner_terms)
+            val termsSpinner = this.binding.spinnerTerms
             termsSpinner.adapter = termsAdapter
 
             // Set the method to run when the spinner's value is changed
@@ -222,8 +232,8 @@ class AccountViewFragment(private var session: WASession, private var actionBar:
                 }
             }
         } catch(error: JSONException) {
-            Toast.makeText(activity!!.applicationContext, error.message, Toast.LENGTH_LONG).show()
-            Toast.makeText(activity!!.applicationContext, getString(R.string.accountView_noTermsError), Toast.LENGTH_LONG).show()
+            Toast.makeText(requireActivity().applicationContext, error.message, Toast.LENGTH_LONG).show()
+            Toast.makeText(requireActivity().applicationContext, getString(R.string.accountView_noTermsError), Toast.LENGTH_LONG).show()
         }
     }
 }

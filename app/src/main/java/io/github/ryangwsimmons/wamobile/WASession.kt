@@ -332,237 +332,100 @@ class WASession(private val username: String, private val password: String, priv
         return searchSectionsData
     }
 
-    private fun formatMeeting(meetingString: String): String {
-        //Function to format meeting strings into how they should look, given a WebAdvisor unformatted meeting string
-        //Full disclosure - while all of the code written below is my own, some of the logic is derived from the same logic used to format the meetings on the actual WebAdvisor page
-        //By making my formatting logic similar to the actual WebAdvisor formatting logic, I can handle any edge cases I might have otherwise missed
-
-        var meeting: String = meetingString
-        //If a meeting only contains dates, returns true, otherwise false
-        fun isDatesOnly(meetingInfo: List<String>): Boolean {
-            return meetingInfo.size <= 2
-        }
-
-        //Gets the location of a meeting
-        fun getLocation(meetingInfo: List<String>): String? {
-            if (!isDatesOnly(meetingInfo)) {
-                return meetingInfo[5].trim()
-            }
-            return null
-        }
-
-        //Regular expression that checks if the meeting string is just dates
-        var regex = Regex("^(\\d{4}/\\d{2}/\\d{2})-(\\d{4}/\\d{2}/\\d{2})$")
-
-        if (regex.matches(meeting)) {
-            //If just dates, put a "|" between the start and end dates
-            meeting = regex.replace(meeting, "$1|$2")
-        } else {
-            //If not just dates, replace all duplicate values in the meeting string
-            meeting = meeting.replace("Days TBA Days TBA", "Days TBA").replace("Times TBA Times TBA", "Times TBA").replace("Room TBA Room TBA", "Room TBA")
-            //Use a regular expression to put "|" between all the different properties of the meeting
-            regex = Regex("^(\\d{4}/\\d{2}/\\d{2})-(\\d{4}/\\d{2}/\\d{2}) (LEC|LAB|SEM|EXAM|Distance Education|Electronic) ((Mon,? ?|Tues,? ?|Wed,? ?|Thur,? ?|Fri,? ?|Sat,? ?|Sun,? ?|Days TBA|Days to be Announced){1,7}),? ?(\\d{2}:\\d{2}[AP]M - \\d{2}:\\d{2}[AP]M|Times TBA|Times to be Announced),? ?(.*Room[^,]*)$")
-            meeting = regex.replace(meeting, "$1|$2|$3|$4|$6|$7")
-        }
-
-        //Create a list of meeting properties by splitting the meeting string using "|" as a delimiter
-        val meetingProps: List<String> = meeting.split("|")
-
-        //Get the meeting method
-        val method: String = if (!isDatesOnly(meetingProps)) {
-            meetingProps[2].trim()
-        } else {
-            ""
-        }
-
-        //Get the meeting days, if available
-        val days: String = if (!isDatesOnly(meetingProps)) {
-            meetingProps[3].trim()
-        } else {
-            ""
-        }
-
-        //Get the meeting time, if available
-        val time: String = if (!isDatesOnly(meetingProps)) {
-            meetingProps[4].trim()
-        } else {
-            ""
-        }
-
-        //Get the meeting end date
-        val end: String = meetingProps[1].trim()
-
-        //Get the meeting building, if available
-        val building: String = if (!isDatesOnly(meetingProps)) {
-            val location = getLocation(meetingProps)
-            if (location != null) {
-                val locationArray = location.split(", ")
-                if (locationArray.size > 1) {
-                    locationArray[0]
-                } else {
-                    ""
-                }
-            } else {
-                ""
-            }
-        } else {
-            ""
-        }
-
-        //Get the meeting room, if available
-        val room: String = if (!isDatesOnly(meetingProps)) {
-            val location = getLocation(meetingProps)
-            if (location != null) {
-                val locationArray = location.split(", ")
-                if (locationArray.size > 1) {
-                    locationArray[1]
-                } else {
-                    locationArray[0]
-                }
-            } else {
-                ""
-            }
-        } else {
-            ""
-        }
-
-        if (!isDatesOnly(meetingProps) && (method == "" || days == "" || time == "" || room == "")) {
-            //If the meeting is not just dates, and one of the key meeting properties is missing, return the original string
-            return meetingString
-        } else if (!isDatesOnly(meetingProps)) {
-            //Otherwise, construct the formatted meeting string
-            val meetingFormatted: StringBuilder = StringBuilder()
-
-            //Create the method and days line
-            meetingFormatted.append("$method $days\n")
-
-            //If the meeting is an exam, add the exam time and date, otherwise just add the time
-            if (method == "EXAM") {
-                meetingFormatted.append("$time ($end)\n")
-            } else {
-                meetingFormatted.append(time + "\n")
-            }
-
-            //If the building is available, add it and the room, otherwise add just the room
-            if (building != "") {
-                meetingFormatted.append("$building, $room")
-            } else {
-                meetingFormatted.append(room)
-            }
-
-            //Return the formatted meeting string
-            return meetingFormatted.toString()
-        }
-
-        //If the meeting is just two dates, return an empty string
-        return ""
-    }
-
 
     @Throws(Exception::class)
-    fun getSearchResults(term: String,
-                         subjects: ArrayList<String>,
-                         courseLevels: ArrayList<String>,
-                         courseNums: ArrayList<String>,
-                         sections: ArrayList<String>,
-                         times: ArrayList<String>,
-                         days: ArrayList<Boolean>,
-                         courseKeywords: String,
-                         location: String,
-                         academicLevel: String,
-                         instructorsLastName: String,
-                         cookies: MutableMap<String, String>): ArrayList<SearchResult> {
-        //Make initial request to filters page
-        var res: Response = this.getSearchSectionsResponse()
+    fun getSearchResults(
+        term: String,
+        meetingStartDate: String,
+        meetingEndDate: String,
+        subjects: ArrayList<String>,
+        courseNums: ArrayList<String>,
+        sections: ArrayList<String>,
+        timeOfDay: String,
+        timeStartsBy: String,
+        timeEndsBy: String,
+        days: ArrayList<Boolean>,
+        location: String,
+        academicLevel: String,
+        page: Int = 1,
+        existingCookies: MutableMap<String, String>? = null,
+        existingReqVerToken: String? = null
+    ): SearchResultsData {
+        var res: Response
+        var cookies: MutableMap<String, String>
+        var reqVerToken: String
 
-        //Create the ArrayList to hold search results
-        val results: ArrayList<SearchResult> = ArrayList()
+        if (existingCookies != null && existingReqVerToken != null) {
+            cookies = existingCookies
+            reqVerToken = existingReqVerToken
+        } else {
+            // Make a request to the Search for Sections page to get a request verification code and cookies
+            res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Courses")
+                .followRedirects(true)
+                .execute()
 
-        //Create and populate a map that holds the request body
-        val searchForm: HashMap<String, String> = HashMap()
+            // Store the cookies in a variable
+            cookies = res.cookies()
 
-        searchForm["VAR1"] = term
-        searchForm["DATE.VAR1"] = ""
-        searchForm["DATE.VAR2"] = ""
-        searchForm["LIST.VAR1_CONTROLLER"] = "LIST.VAR1"
-        searchForm["LIST.VAR1_MEMBERS"] = "LIST.VAR1*LIST.VAR2*LIST.VAR3*LIST.VAR4"
-        searchForm["LIST.VAR1_MAX"] = "5"
-        searchForm["LIST.VAR2_MAX"] = "5"
-        searchForm["LIST.VAR3_MAX"] = "5"
-        searchForm["LIST.VAR4_MAX"] = "5"
-        subjects.forEachIndexed {index, subject ->
-            searchForm["LIST.VAR1_" + (index + 1).toString()] = subject
-            searchForm["LIST.VAR2_" + (index + 1).toString()] = courseLevels[index]
-            searchForm["LIST.VAR3_" + (index + 1).toString()] = courseNums[index]
-            searchForm["LIST.VAR4_" + (index + 1).toString()] = sections[index]
+            // Parse the response text to get the HTML
+            val doc = res.parse()
+
+            // Store the request verification token in a variable
+            reqVerToken = doc.select("input[name='__RequestVerificationToken']").attr("value")
         }
-        searchForm["VAR7"] = times[0]
-        searchForm["VAR8"] = times[1]
-        days.forEachIndexed {index, day ->
-            searchForm["VAR" + (10 + index).toString()] = if (day) "Y" else ""
-        }
-        searchForm["VAR3"] = courseKeywords
-        searchForm["VAR6"] = location
-        searchForm["VAR21"] = academicLevel
-        searchForm["VAR9"] = instructorsLastName
-        searchForm["RETURN.URL"] = "https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + this.homeCookies["LASTTOKEN"] + "&type=M&constituency=WBST&pid=CORE-WBST"
-        searchForm["SUBMIT_OPTIONS"] = ""
 
-        //Make the connection to the server to get the search results page
-        res = Jsoup.connect(res.url().toString())
-            .data(searchForm)
-            .cookies(res.cookies())
+        // Build the POST body JSON for the next request
+        val postBodyJson = """
+            {
+                "searchParameters": "{
+                    \"terms\": [${if (term == "") "" else "\\\"$term\\\""}],
+                    \"startTime\": ${if (timeOfDay.split(',')[0] == "") "null" else timeOfDay.split(',')[0]},
+                    \"endTime\": ${if (timeOfDay.split(',')[1] == "") "null" else timeOfDay.split(',')[1]},
+                    \"academicLevels\": [${if (academicLevel == "") "" else "\\\"$academicLevel\\\""}],
+                    \"days\": [${days.mapIndexedNotNull { index: Int, day: Boolean -> if (day) "\\\"$index\\\"" else null}.joinToString(", ")}],
+                    \"locations\": [${if (location == "") "" else "\\\"$location\\\""}],
+                    \"keywordComponents\": [${subjects.mapIndexedNotNull { index: Int, subject: String ->
+                        if (subject != "" || courseNums[index] != "" || sections[index] != "") {
+                            """
+                                {
+                                    \"subject\": \"$subject\",
+                                    \"courseNumber\": \"${courseNums[index]}\",
+                                    \"section\": \"${sections[index]}\",
+                                    \"synonym\": \"\"
+                                }
+                            """.trimIndent()
+                        } else null
+                    }.joinToString(", ")}],
+                    \"startDate\": ${if (meetingStartDate == "") "null" else "\\\"$meetingStartDate\\\""},
+                    \"endDate\": ${if (meetingEndDate == "") "null" else "\\\"$meetingEndDate\\\""},
+                    \"startsAtTime\": ${if (timeStartsBy == "") "null" else "\\\"$timeStartsBy\\\""},
+                    \"endsByTime\": ${if (timeEndsBy == "") "null" else "\\\"$timeEndsBy\\\""},
+                    \"pageNumber\": $page,
+                    \"sortOn\": \"None\",
+                    \"sortDirection\": \"Ascending\",
+                    \"quantityPerPage\": 30,
+                    \"searchResultsView\": \"SectionListing\"
+                }"
+            }
+        """.trimIndent().replace("\n", "")
+
+        res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Courses/SearchAsync")
             .method(Method.POST)
-            .followRedirects(true)
+            .ignoreContentType(true)
+            .cookies(cookies)
+            .header("Content-Type", "application/json, charset=utf-8")
+            .header("X-Requested-With", "XMLHttpRequest")
+            .header("__RequestVerificationToken", reqVerToken)
+            .requestBody(postBodyJson)
             .execute()
 
-        //Store the cookies from the response in the parameter
-        cookies.putAll(res.cookies())
-
-        //Parse the response's HTML
-        val doc: Document = res.parse()
-
-        //Go through the results, parse the HTML for the properties of each section, and add each result into the ArrayList
-        for (result: Element in doc.getElementById("GROUP_Grp_WSS_COURSE_SECTIONS").getElementsByTag("tbody")[0].getElementsByTag("tr")) {
-            if (result.getElementsByTag("td").size > 0) {
-                val term: String = result.getElementsByClass("WSS_COURSE_SECTIONS")[0].getElementsByTag("p")[0].text()
-                val status: String = result.getElementsByClass("LIST_VAR1")[0].getElementsByTag("p")[0].text()
-                val title: String = result.getElementsByClass("SEC_SHORT_TITLE")[0].getElementsByTag("a")[0].text()
-                val location: String = result.getElementsByClass("SEC_LOCATION")[0].getElementsByTag("p")[0].text()
-
-                val meetings: ArrayList<String> = ArrayList()
-                var unformattedMeetingsString: String = result.getElementsByClass("SEC_MEETING_INFO")[0].getElementsByTag("p")[0].text()
-                val regex = Regex("([ \\n])(\\d{4}/\\d{2}/\\d{2}|/ {2}/ {2} {2})")
-                unformattedMeetingsString = regex.replace(unformattedMeetingsString) { match -> "^" + match.groupValues[2]}
-                val unformattedMeetings = unformattedMeetingsString.split("^")
-                unformattedMeetings.forEachIndexed { index, unformattedMeeting ->
-                    if (index < unformattedMeetings.size - 1) {
-                        meetings.add(formatMeeting(unformattedMeeting) + "\n\n")
-                    } else {
-                        meetings.add(formatMeeting(unformattedMeeting))
-                    }
-                }
-
-                val faculty: String = result.getElementsByClass("SEC_FACULTY_INFO")[0].getElementsByTag("p")[0].text()
-                val availableCapacity: String = result.getElementsByClass("LIST_VAR5")[0].getElementsByTag("p")[0].text()
-                val credits: String = result.getElementsByClass("SEC_MIN_CRED")[0].getElementsByTag("p")[0].text()
-                val academicLevel: String = result.getElementsByClass("SEC_ACAD_LEVEL")[0].getElementsByTag("p")[0].text()
-
-                //Extract the details URL parameters from the onclick attribute of the title link, and replace the initial "?? with an "&" so that it can be added onto the end of a URL
-                val detailsURL: String = "(?<=')(.*?)(?=')".toRegex().find(result.getElementsByClass("SEC_SHORT_TITLE")[0].getElementsByTag("a")[0].attr("onclick"))!!.value.replace("&CLONE=Y", "")
-
-                results.add(SearchResult(term, status, title, location, meetings, faculty, availableCapacity, credits, academicLevel, detailsURL))
-            }
-        }
-
-        //Return the ArrayList of results
-        return results
+        return SearchResultsData(cookies, reqVerToken, res.body())
     }
 
     @SuppressLint("DefaultLocale")
     fun getSectionDetails(cookies: Map<String, String>, result: SearchResult): SectionDetails {
         //Make the connection to the server
-        var res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor" + result.detailsURL)
+        var res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor")
             .cookies(cookies)
             .followRedirects(true)
             .execute()

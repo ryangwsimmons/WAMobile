@@ -16,8 +16,7 @@ import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager
 import com.google.android.material.navigation.NavigationView
-import kotlinx.android.synthetic.main.activity_base.*
-import kotlinx.android.synthetic.main.toolbar_layout.*
+import io.github.ryangwsimmons.wamobile.databinding.ActivityBaseBinding
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
@@ -25,6 +24,8 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class BaseActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityBaseBinding
 
     private lateinit var session: WASession
     private lateinit var toolbar: Toolbar
@@ -39,19 +40,21 @@ class BaseActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_base)
+        binding = ActivityBaseBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         //Get the session object
         val bundle: Bundle = intent.getBundleExtra("bundle")!!
         this.session = bundle.getParcelable("session")!!
 
         //Define the toolbar for the activity
-        this.toolbar = toolBar
+        this.toolbar = this.binding.layoutToolbar.toolBar
         setSupportActionBar(toolbar)
 
         //Get other layout items
-        this.progressBar = progress_bar
-        this.fragmentContainer = fragment_container
+        this.progressBar = this.binding.progressBar
+        this.fragmentContainer = this.binding.fragmentContainer
 
         //Set properties for the ActionBar in the activity
         this.actionBar = supportActionBar!!
@@ -59,10 +62,10 @@ class BaseActivity : AppCompatActivity() {
         actionBar.setHomeAsUpIndicator(R.drawable.ic_menu)
 
         //Define the DrawerLayout, FragmentManager, NavMenuItemListener, and NavigationView for the activity
-        this.drawerLayout = drawer_layout
+        this.drawerLayout = this.binding.drawerLayout
         this.fragmentManager = supportFragmentManager
         this.navListener = NavMenuItemListener(session, this.fragmentManager, this.drawerLayout, actionBar, this.progressBar, this.fragmentContainer)
-        this.navigationView = navigation_view
+        this.navigationView = this.binding.navigationView
 
         //Set the listeners for the NavigationView
         this.navigationView.setNavigationItemSelectedListener(this.navListener)

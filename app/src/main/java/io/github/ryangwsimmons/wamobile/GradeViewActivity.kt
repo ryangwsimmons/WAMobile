@@ -8,13 +8,14 @@ import androidx.appcompat.app.ActionBar
 import androidx.appcompat.widget.Toolbar
 import androidx.appcompat.app.AppCompatActivity
 import androidx.recyclerview.widget.LinearLayoutManager
-import kotlinx.android.synthetic.main.activity_grade_view.*
-import kotlinx.android.synthetic.main.toolbar_layout.*
+import io.github.ryangwsimmons.wamobile.databinding.ActivityGradeViewBinding
 import kotlinx.coroutines.*
 import kotlinx.coroutines.Dispatchers.Main
 import org.apache.commons.lang3.StringUtils
 
 class GradeViewActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityGradeViewBinding
 
     private lateinit var session: WASession
     private lateinit var terms: ArrayList<Term>
@@ -26,7 +27,9 @@ class GradeViewActivity : AppCompatActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_grade_view)
+        binding = ActivityGradeViewBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         //Get the bundle from the previous activity
         val bundle = intent.getBundleExtra("bundle")!!
@@ -41,7 +44,7 @@ class GradeViewActivity : AppCompatActivity() {
         this.position = bundle.getInt("position")
 
         //Define the toolbar for the activity
-        this.toolbar = toolBar
+        this.toolbar = this.binding.layoutToolbar.toolBar
         setSupportActionBar(toolbar)
 
         //Set properties for the ActionBar in the activity
@@ -53,8 +56,8 @@ class GradeViewActivity : AppCompatActivity() {
 
         //Set up the recycler view settings
         val adapter: GradeViewAdapter = GradeViewAdapter(ArrayList())
-        recyclerView_grades.adapter = adapter
-        recyclerView_grades.layoutManager = LinearLayoutManager(this)
+        this.binding.recyclerViewGrades.adapter = adapter
+        this.binding.recyclerViewGrades.layoutManager = LinearLayoutManager(this)
 
         //Create an error handler for the coroutine that will be executed to get the grades
         val errorHandler = CoroutineExceptionHandler { _, error ->
@@ -84,9 +87,9 @@ class GradeViewActivity : AppCompatActivity() {
             withContext(Main) {
                 adapter.setItems(this@GradeViewActivity.grades)
                 adapter.notifyItemInserted(this@GradeViewActivity.grades.size - 1)
-                textView_advisorName.text = StringUtils.abbreviate(advisor.toString(), 20)
-                textView_TermGPAValue.text = termGPA.toString()
-                relativeLayout_AdvisorGPA.visibility = View.VISIBLE
+                this@GradeViewActivity.binding.textViewAdvisorName.text = StringUtils.abbreviate(advisor.toString(), 20)
+                this@GradeViewActivity.binding.textViewTermGPAValue.text = termGPA.toString()
+                this@GradeViewActivity.binding.relativeLayoutAdvisorGPA.visibility = View.VISIBLE
             }
         }
     }

@@ -1,6 +1,5 @@
 package io.github.ryangwsimmons.wamobile
 
-import android.content.DialogInterface
 import android.content.Intent
 import android.content.SharedPreferences
 import android.os.Bundle
@@ -11,7 +10,7 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.appcompat.app.AlertDialog
 import androidx.appcompat.app.AppCompatActivity
-import kotlinx.android.synthetic.main.activity_main.*
+import io.github.ryangwsimmons.wamobile.databinding.ActivityMainBinding
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
@@ -19,9 +18,14 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 
 class MainActivity : AppCompatActivity() {
+
+    private lateinit var binding: ActivityMainBinding
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_main)
+        binding = ActivityMainBinding.inflate(layoutInflater)
+        val view = binding.root
+        setContentView(view)
 
         //Show the initial dialog that appears when the app is started for the first time
         val prefs: SharedPreferences = getSharedPreferences("prefs", MODE_PRIVATE)
@@ -31,11 +35,11 @@ class MainActivity : AppCompatActivity() {
         }
 
         //Set the action for when the "Login" button is tapped
-        button_login.setOnClickListener(fun (v: View) {
+        this.binding.buttonLogin.setOnClickListener(fun (v: View) {
 
             //Get the username and password the user entered
-            val username: String = editText_username.text.toString()
-            val password: String = editText_password.text.toString()
+            val username: String = this.binding.editTextUsername.text.toString()
+            val password: String = this.binding.editTextPassword.text.toString()
 
             //Make sure that a username and password have been entered
             if (username == "" || password == "") {

@@ -8,6 +8,8 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.BaseExpandableListAdapter
 import android.widget.TextView
+import kotlinx.android.synthetic.main.account_view_list_group.view.*
+import kotlinx.android.synthetic.main.account_view_list_item.view.*
 import java.util.*
 
 class SubGroupListAdapter(private val parentContext: Context, private val transaction: AccountViewTransaction): BaseExpandableListAdapter() {
@@ -40,8 +42,8 @@ class SubGroupListAdapter(private val parentContext: Context, private val transa
         }
 
         // Define the group name and amount
-        val groupName: TextView = groupConvertView.findViewById(R.id.groupName)
-        val groupAmount: TextView = groupConvertView.findViewById(R.id.groupAmount)
+        val groupName: TextView = groupConvertView.groupName
+        val groupAmount: TextView = groupConvertView.groupAmount
 
         groupName.text = getGroup(groupPosition).name
 
@@ -66,10 +68,10 @@ class SubGroupListAdapter(private val parentContext: Context, private val transa
         val child = getChild(groupPosition, childPosition)
 
         // Define the child name and amount
-        val itemName: TextView = itemConvertView.findViewById(R.id.itemName)
+        val itemName: TextView = itemConvertView.itemName
         itemName.text = child.name
 
-        val itemAmount: TextView = itemConvertView.findViewById(R.id.itemAmount)
+        val itemAmount: TextView = itemConvertView.itemAmount
         val amountFormat = NumberFormat.getCurrencyInstance(Locale.getDefault())
         amountFormat.currency = Currency.getInstance("CAD")
         itemAmount.text = amountFormat.format(child.amount)

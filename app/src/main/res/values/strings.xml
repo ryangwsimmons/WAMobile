@@ -52,8 +52,6 @@
     <string name="search_sections_academicLevel">Academic Level:</string>
     <string name="search_sections_instructorsLastName">Instructor\'s Last Name:</string>
     <string name="search_sections_submit">Submit</string>
-    <string name="sfs_no_term_selected">Please select a term</string>
-    <string name="sfs_not_enough_fields">Please fill out at least 2 fields</string>
 
     <string name="threeletterweek_monday">Mon</string>
     <string name="threeletterweek_tuesday">Tue</string>
@@ -64,6 +62,7 @@
     <string name="threeletterweek_sunday">Sun</string>
 
     <string name="searchResults_title">Search Results</string>
+    <string name="searchResults_noResults">No Sections Found</string>
     <string name="section_status">Status:</string>
     <string name="section_location">Location:</string>
     <string name="section_term">Term:</string>

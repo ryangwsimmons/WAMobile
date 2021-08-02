@@ -12,5 +12,4 @@ data class SearchResult(val term: String,
                         val faculty: String,
                         val available: String,
                         val credits: String,
-                        val academicLevel: String,
-                        val detailsURL: String): Parcelable
+                        val academicLevel: String): Parcelable
