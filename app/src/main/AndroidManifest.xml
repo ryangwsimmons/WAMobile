@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="io.github.ryangwsimmons.wamobile">
+    package="ca.ryangwsimmons.wamobile">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -13,13 +13,13 @@
         android:theme="@style/AppTheme"
         android:fullBackupContent="@xml/backup_descriptor"
         android:networkSecurityConfig="@xml/network_security_config">
-        <activity android:name=".SectionDetailsActivity" />
-        <activity android:name=".SearchResultsActivity" />
+        <activity android:name="ca.ryangwsimmons.wamobile.SectionDetailsActivity" />
+        <activity android:name="ca.ryangwsimmons.wamobile.SearchResultsActivity" />
         <activity
-            android:name=".GradeViewActivity"
+            android:name="ca.ryangwsimmons.wamobile.GradeViewActivity"
             android:label="@string/title_activity_grade_view" />
-        <activity android:name=".BaseActivity" />
-        <activity android:name=".MainActivity">
+        <activity android:name="ca.ryangwsimmons.wamobile.BaseActivity" />
+        <activity android:name="ca.ryangwsimmons.wamobile.MainActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
