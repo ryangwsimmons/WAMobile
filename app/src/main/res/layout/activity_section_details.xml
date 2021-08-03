@@ -7,14 +7,27 @@
     tools:context=".SectionDetailsActivity"
     android:orientation="vertical">
 
-    <include layout="@layout/toolbar_layout" />
+    <include layout="@layout/toolbar_layout" android:id="@+id/layout_toolbar" />
+
+    <RelativeLayout
+        android:id="@+id/progressBar_sectionDetails_wrapper"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent">
+
+        <ProgressBar
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_centerInParent="true"/>
+
+    </RelativeLayout>
 
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:id="@+id/scrollView_sectionDetails_content"
-        android:visibility="invisible">
+        android:visibility="gone">
         <LinearLayout
+            android:id="@+id/linearLayout_sectionsDetails_content"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:orientation="vertical">
@@ -52,153 +65,6 @@
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:id="@+id/sectionDetails_offerings_container"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_offeringsLabel"
-                    android:layout_marginEnd="8dp"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:text="@string/sectionDetails_offerings" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_offerings"
-                    android:layout_alignBaseline="@id/textView_sectionDetails_offeringsLabel"
-                    android:layout_toEndOf="@id/textView_sectionDetails_offeringsLabel"
-                    android:text="CIS*1000, CIS*2000" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/sectionDetails_restrictions_container"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_restrictionsLabel"
-                    android:layout_marginEnd="8dp"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:text="@string/sectionDetails_restrictions" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_restrictions"
-                    android:layout_alignBaseline="@id/textView_sectionDetails_restrictionsLabel"
-                    android:layout_toEndOf="@id/textView_sectionDetails_restrictionsLabel"
-                    android:text="CIS*1000, CIS*2000" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/sectionDetails_prereqs_container"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_prereqsLabel"
-                    android:layout_marginEnd="8dp"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:text="@string/sectionDetails_prereqs" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_prereqs"
-                    android:layout_alignBaseline="@id/textView_sectionDetails_prereqsLabel"
-                    android:layout_toEndOf="@id/textView_sectionDetails_prereqsLabel"
-                    android:text="CIS*1000, CIS*2000" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_departmentsLabel"
-                    android:layout_marginEnd="8dp"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:text="@string/sectionDetails_departments" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_departments"
-                    android:layout_alignBaseline="@id/textView_sectionDetails_departmentsLabel"
-                    android:layout_toEndOf="@id/textView_sectionDetails_departmentsLabel"
-                    android:text="School of Computer Science" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_startDateLabel"
-                    android:layout_marginEnd="8dp"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:text="@string/sectionDetails_startDate" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_startDate"
-                    android:layout_alignBaseline="@id/textView_sectionDetails_startDateLabel"
-                    android:layout_toEndOf="@id/textView_sectionDetails_startDateLabel"
-                    android:text="1 January 1970" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_endDateLabel"
-                    android:layout_marginEnd="8dp"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:text="@string/sectionDetails_endDate" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_endDate"
-                    android:layout_alignBaseline="@id/textView_sectionDetails_endDateLabel"
-                    android:layout_toEndOf="@id/textView_sectionDetails_endDateLabel"
-                    android:text="1 January 1970" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
                 android:layout_marginStart="12dp"
                 android:layout_marginEnd="12dp">
@@ -223,6 +89,7 @@
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:id="@+id/sectionDetails_email_container"
                 android:layout_marginTop="16dp"
                 android:layout_marginStart="12dp"
@@ -248,6 +115,7 @@
             <RelativeLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:visibility="gone"
                 android:id="@+id/sectionDetails_phone_container"
                 android:layout_marginTop="16dp"
                 android:layout_marginStart="12dp"
@@ -267,31 +135,6 @@
                     android:id="@+id/textView_sectionDetails_facultyPhone"
                     android:layout_alignBaseline="@id/textView_sectionDetails_facultyPhoneLabel"
                     android:layout_toEndOf="@id/textView_sectionDetails_facultyPhoneLabel"
-                    android:text="someone@email.com" />
-            </RelativeLayout>
-
-            <RelativeLayout
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:id="@+id/sectionDetails_extension_container"
-                android:layout_marginTop="16dp"
-                android:layout_marginStart="12dp"
-                android:layout_marginEnd="12dp">
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_facultyExtensionLabel"
-                    android:layout_marginEnd="8dp"
-                    android:textSize="16sp"
-                    android:textStyle="bold"
-                    android:text="@string/sectionDetails_facultyExtension" />
-
-                <TextView
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:id="@+id/textView_sectionDetails_facultyExtension"
-                    android:layout_alignBaseline="@id/textView_sectionDetails_facultyExtensionLabel"
-                    android:layout_toEndOf="@id/textView_sectionDetails_facultyExtensionLabel"
                     android:text="someone@email.com" />
             </RelativeLayout>
 

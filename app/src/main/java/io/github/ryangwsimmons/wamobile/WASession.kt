@@ -275,61 +275,14 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    fun getSearchSectionsFilterValues(): SearchSectionsData {
+    fun getSearchSectionsFilterValues(): String {
         // Make a request to the Catalog Advanced Search options endpoint
         val res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Courses/GetCatalogAdvancedSearchAsync")
             .ignoreContentType(true)
             .execute()
 
-        // Parse the request JSON
-        val dataJson = JSONObject(res.body())
-
-        // Create a new SearchSectionsData object to hold the response data
-        val searchSectionsData = SearchSectionsData()
-
-        // Parse the subjects array to get all available subjects
-        val subjectsArray = dataJson.getJSONArray("Subjects")
-        for (i in 0 until subjectsArray.length()) {
-            val subjectJson = subjectsArray.getJSONObject(i)
-            if (subjectJson.getBoolean("ShowInCourseSearch")) {
-                searchSectionsData.subjects.add(DropdownOption(subjectJson.getString("Description"), subjectJson.getString("Code")))
-            }
-        }
-
-        // Parse the terms array to get all available terms
-        val termsArray = dataJson.getJSONArray("Terms")
-        for (i in 0 until termsArray.length()) {
-            val termJson = termsArray.getJSONObject(i)
-            searchSectionsData.terms.add(DropdownOption(termJson.getString("Item2"), termJson.getString("Item1")))
-        }
-
-        // Parse the locations array to get all available locations
-        val locationsArray = dataJson.getJSONArray("Locations")
-        for (i in 0 until locationsArray.length()) {
-            val locationJson = locationsArray.getJSONObject(i)
-            searchSectionsData.locations.add(DropdownOption(locationJson.getString("Item2"), locationJson.getString("Item1")))
-        }
-
-        // Parse the academic levels array to get all available academic levels
-        val academicLevelsArray = dataJson.getJSONArray("AcademicLevels")
-        for (i in 0 until academicLevelsArray.length()) {
-            val academicLevelJson = academicLevelsArray.getJSONObject(i)
-            searchSectionsData.academicLevels.add(DropdownOption(academicLevelJson.getString("Item2"), academicLevelJson.getString("Item1")))
-        }
-
-        // Parse the meeting times array to get all available meeting times
-        val meetingTimesArray = dataJson.getJSONArray("TimeRanges")
-        for (i in 0 until meetingTimesArray.length()) {
-            val meetingTimeJson = meetingTimesArray.getJSONObject(i)
-            val beginningTime = meetingTimeJson.getInt("Item2")
-            val endTime = meetingTimeJson.getInt("Item3")
-            searchSectionsData.meetingTimes.add(DropdownOption(
-                meetingTimeJson.getString("Item1"),
-                "$beginningTime,$endTime"
-            ))
-        }
-
-        return searchSectionsData
+        // Return the JSON string
+        return res.body()
     }
 
 
@@ -359,8 +312,29 @@ class WASession(private val username: String, private val password: String, priv
             cookies = existingCookies
             reqVerToken = existingReqVerToken
         } else {
+            // Check that a connection has been initialized
+            if (this.homeCookies.isEmpty()) {
+                throw Exception("Error: The connection has not yet been initialized.")
+            }
+
+            // Connect to the WebAdvisor students page
+            res = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TYPE=M&CONSTITUENCY=WBST&PID=CORE-WBST&TOKENIDX=" + this.homeCookies["LASTTOKEN"])
+                .cookies(this.homeCookies)
+                .followRedirects(true)
+                .execute()
+
+            // Parse the HTML
+            var doc = res.parse()
+
+            // Get the <a> tag for the course catalog page, extract the token
+            val token = "Token=(.*)\$".toRegex().find(
+                doc.getElementsByClass("subnav")[0]
+                    .select("a:contains(Search the Course Catalogue)")[0]
+                    .attr("href")
+            )!!.groupValues[1]
+
             // Make a request to the Search for Sections page to get a request verification code and cookies
-            res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Courses")
+            res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Courses?Token=$token")
                 .followRedirects(true)
                 .execute()
 
@@ -368,7 +342,7 @@ class WASession(private val username: String, private val password: String, priv
             cookies = res.cookies()
 
             // Parse the response text to get the HTML
-            val doc = res.parse()
+            doc = res.parse()
 
             // Store the request verification token in a variable
             reqVerToken = doc.select("input[name='__RequestVerificationToken']").attr("value")
@@ -422,64 +396,22 @@ class WASession(private val username: String, private val password: String, priv
         return SearchResultsData(cookies, reqVerToken, res.body())
     }
 
-    @SuppressLint("DefaultLocale")
-    fun getSectionDetails(cookies: Map<String, String>, result: SearchResult): SectionDetails {
-        //Make the connection to the server
-        var res: Response = Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor")
+    fun getSectionDetails(sectionId: String, cookies: MutableMap<String, String>, reqVerToken: String): String {
+        // Build the body for the POST request
+        val postBody = "{\"sectionId\": \"$sectionId\"}"
+
+        // Make a request to the API to get section details for the given ID
+        val res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Courses/SectionDetails")
+            .method(Method.POST)
+            .ignoreContentType(true)
             .cookies(cookies)
-            .followRedirects(true)
+            .header("Content-Type", "application/json")
+            .header("X-Requested-With", "XMLHttpRequest")
+            .header("__RequestVerificationToken", reqVerToken)
+            .requestBody(postBody)
             .execute()
 
-        val doc: Document = res.parse()
-
-        //Get the course name and split it into sections
-        val courseNameSections: List<String> = doc.getElementById("VAR2").text().split("*")
-
-        //Get the course name without the section, in all lowercase
-        val courseName: String = (courseNameSections[0] + courseNameSections[1]).toLowerCase()
-
-        //Create a variable that holds the url for the course calendar, and populate it based on the academic level of the course
-        var calendarURL = ""
-        when (result.academicLevel) {
-            "Diploma" -> calendarURL = "https://www.uoguelph.ca/registrar/calendars/diploma/current/courses/"
-            "Graduate" -> calendarURL = "https://www.uoguelph.ca/registrar/calendars/graduate/current/courses/"
-            "Undergraduate" -> calendarURL = "https://www.uoguelph.ca/registrar/calendars/undergraduate/current/courses/"
-            "Undergraduate Guelph-Humber" -> calendarURL = "https://www.uoguelph.ca/registrar/calendars/guelphhumber/current/courses/"
-        }
-
-        //Connect to the calendar page
-        res = Jsoup.connect("$calendarURL$courseName.shtml")
-            .followRedirects(true)
-            .execute()
-
-        //Parse the calendar document
-        val calDoc: Document = res.parse()
-
-        //Get the section details, and store them in variables
-        val title: String = calDoc.getElementById("content").getElementsByClass("title")[0].text()
-        val description: String = calDoc.getElementById("content").getElementsByClass("description")[0].text()
-        var offerings = ""
-        if (calDoc.getElementById("content").getElementsByClass("offerings").size > 0) {
-            offerings = calDoc.getElementById("content").getElementsByClass("offerings")[0].getElementsByClass("text")[0].text()
-        }
-        var restrictions = ""
-        if (calDoc.getElementById("content").getElementsByClass("restrictions").size > 0) {
-            restrictions = calDoc.getElementById("content").getElementsByClass("restrictions")[0].getElementsByClass("text")[0].text()
-        }
-        var prereqs = ""
-        if (calDoc.getElementById("content").getElementsByClass("prereqs").size > 0){
-            prereqs = calDoc.getElementById("content").getElementsByClass("prereqs")[0].getElementsByClass("text")[0].text()
-        }
-        val departments: String = calDoc.getElementById("content").getElementsByClass("departments")[0].getElementsByClass("text")[0].text()
-        val startDate: String = doc.getElementById("VAR6").text()
-        val endDate: String = doc.getElementById("VAR7").text()
-        val facultyName: String = doc.getElementById("LIST_VAR7_1").text()
-        val facultyEmail: String = doc.getElementById("LIST_VAR10_1").text()
-        val facultyPhone: String = doc.getElementById("LIST_VAR8_1").text()
-        val facultyExtension: String = doc.getElementById("LIST_VAR9_1").text()
-
-        //Return a new SectionDetails object containing the data
-        return SectionDetails(title, description, offerings, restrictions, prereqs, departments, startDate, endDate, facultyName, facultyEmail, facultyPhone, facultyExtension)
+        return res.body()
     }
 
     @Throws(Exception::class)

@@ -36,7 +36,7 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
     private lateinit var location: String
     private lateinit var academicLevel: String
 
-    private lateinit var cookies: MutableMap<String, String>
+    private lateinit var cookies: HashMap<String, String>
     private lateinit var reqVerToken: String
     private var results: ArrayList<SearchResult> = ArrayList<SearchResult>()
 
@@ -138,7 +138,7 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
 
     private fun wrapData(data: SearchResultsData) {
         // Place the cookies and request verification token into their own attributes
-        this.cookies = data.cookies
+        this.cookies = data.cookies as HashMap<String, String>
         this.reqVerToken = data.reqVerToken
 
         // Parse the results JSON into an ArrayList of SearchResult objects
@@ -203,6 +203,11 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
             // Get the academic level string
             val academicLevel = sectionJson.getString("AcademicLevel")
 
+            // Get the "CourseDescription" string
+            val unparsedDescriptionString = sectionJson.getString("CourseDescription")
+
+            val sectionId = sectionJson.getString("Id")
+
             // Create the SearchResult object and add it to the results ArrayList
             this.results.add(SearchResult(
                 term,
@@ -213,7 +218,9 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
                 faculty,
                 available,
                 credits,
-                academicLevel
+                academicLevel,
+                unparsedDescriptionString,
+                sectionId
             ))
         }
     }
@@ -225,7 +232,9 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
             val bundle = Bundle()
             bundle.putParcelable("session", this@SearchResultsActivity.session)
             bundle.putParcelable("result", this@SearchResultsActivity.results[position])
+            bundle.putString("reqVerToken", this@SearchResultsActivity.reqVerToken)
             putExtra("bundle", bundle)
+            putExtra("cookies", this@SearchResultsActivity.cookies)
         }
 
         //Start the activity

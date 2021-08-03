@@ -16,6 +16,7 @@ import android.widget.*
 import androidx.appcompat.app.ActionBar
 import io.github.ryangwsimmons.wamobile.databinding.FragmentSearchSectionsBinding
 import kotlinx.coroutines.*
+import org.json.JSONObject
 import kotlin.reflect.KFunction3
 
 class SearchSectionsFragment(private var session: WASession, private var actionBar: ActionBar, private var progressBar: View, private var crossFade: KFunction3<View, View, Boolean, Unit>) : Fragment(), OnDateSetListener, OnTimeSetListener {
@@ -75,8 +76,11 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
 
         // Launch a coroutine to get the search sections options
         CoroutineScope(errorHandler).launch {
-            //Populate all the ArrayLists with the options
-            this@SearchSectionsFragment.searchSectionsData = this@SearchSectionsFragment.session.getSearchSectionsFilterValues()
+            // Populate all the ArrayLists with the options
+            val data = this@SearchSectionsFragment.session.getSearchSectionsFilterValues()
+
+            // Wrap the JSON string into a Kotlin object
+            wrapData(data)
 
             withContext(Dispatchers.Main) {
                 //Initialize all the adapters and spinners
@@ -145,6 +149,58 @@ class SearchSectionsFragment(private var session: WASession, private var actionB
     override fun onDestroyView() {
         super.onDestroyView()
         _binding = null
+    }
+
+    private fun wrapData(data: String) {
+        // Parse the request JSON
+        val dataJson = JSONObject(data)
+
+        // Create a new SearchSectionsData object to hold the response data
+        val searchSectionsData = SearchSectionsData()
+
+        // Parse the subjects array to get all available subjects
+        val subjectsArray = dataJson.getJSONArray("Subjects")
+        for (i in 0 until subjectsArray.length()) {
+            val subjectJson = subjectsArray.getJSONObject(i)
+            if (subjectJson.getBoolean("ShowInCourseSearch")) {
+                searchSectionsData.subjects.add(DropdownOption(subjectJson.getString("Description"), subjectJson.getString("Code")))
+            }
+        }
+
+        // Parse the terms array to get all available terms
+        val termsArray = dataJson.getJSONArray("Terms")
+        for (i in 0 until termsArray.length()) {
+            val termJson = termsArray.getJSONObject(i)
+            searchSectionsData.terms.add(DropdownOption(termJson.getString("Item2"), termJson.getString("Item1")))
+        }
+
+        // Parse the locations array to get all available locations
+        val locationsArray = dataJson.getJSONArray("Locations")
+        for (i in 0 until locationsArray.length()) {
+            val locationJson = locationsArray.getJSONObject(i)
+            searchSectionsData.locations.add(DropdownOption(locationJson.getString("Item2"), locationJson.getString("Item1")))
+        }
+
+        // Parse the academic levels array to get all available academic levels
+        val academicLevelsArray = dataJson.getJSONArray("AcademicLevels")
+        for (i in 0 until academicLevelsArray.length()) {
+            val academicLevelJson = academicLevelsArray.getJSONObject(i)
+            searchSectionsData.academicLevels.add(DropdownOption(academicLevelJson.getString("Item2"), academicLevelJson.getString("Item1")))
+        }
+
+        // Parse the meeting times array to get all available meeting times
+        val meetingTimesArray = dataJson.getJSONArray("TimeRanges")
+        for (i in 0 until meetingTimesArray.length()) {
+            val meetingTimeJson = meetingTimesArray.getJSONObject(i)
+            val beginningTime = meetingTimeJson.getInt("Item2")
+            val endTime = meetingTimeJson.getInt("Item3")
+            searchSectionsData.meetingTimes.add(DropdownOption(
+                meetingTimeJson.getString("Item1"),
+                "$beginningTime,$endTime"
+            ))
+        }
+
+        this.searchSectionsData = searchSectionsData
     }
 
     private fun initializeAdapters() {
