@@ -6,7 +6,6 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.recycleritem_term.view.*
 
 class TermsAdapter(private var terms: List<Term>, private val listener: OnTermClickListener, private val context: Context): RecyclerView.Adapter<TermsAdapter.TermViewHolder>() {
 
@@ -18,10 +17,10 @@ class TermsAdapter(private var terms: List<Term>, private val listener: OnTermCl
 
     //Create a view holder to hold the data for each term
     inner class TermViewHolder(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener {
-        val longName: TextView = itemView.textView_term_longName
-        val shortName: TextView = itemView.textView_term_shortName
-        val startDate: TextView = itemView.textView_term_startDate
-        val endDate: TextView = itemView.textView_term_endDate
+        val longName: TextView = itemView.findViewById(R.id.textView_term_longName)
+        val shortName: TextView = itemView.findViewById(R.id.textView_term_shortName)
+        val startDate: TextView = itemView.findViewById(R.id.textView_term_startDate)
+        val endDate: TextView = itemView.findViewById(R.id.textView_term_endDate)
 
         //Set the listener function for the term being clicked to the listener function in this class
         init {

@@ -4,24 +4,25 @@ import android.text.SpannedString
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.recycleritem_section.view.*
+import org.w3c.dom.Text
 
 class SearchResultsAdapter(private var results: List<SearchResult>, private val listener: OnSectionClickListener): RecyclerView.Adapter<SearchResultsAdapter.SectionHolder>() {
 
     //Create a view holder to hold the data for each section
     inner class SectionHolder(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener {
-        val title: TextView = itemView.textView_section_courseTitle
-        val status: TextView = itemView.textView_section_status
-        val location: TextView = itemView.textView_section_location
-        val term: TextView = itemView.textView_section_term
-        val faculty: TextView = itemView.textView_section_faculty
-        val available: TextView = itemView.textView_section_available
-        val credits: TextView = itemView.textView_section_credits
-        val academicLevel: TextView = itemView.textView_section_academicLevel
-        val meetings: TextView = itemView.textView_section_meetings
+        val title: TextView = itemView.findViewById(R.id.textView_section_courseTitle)
+        val status: TextView = itemView.findViewById(R.id.textView_section_status)
+        val location: TextView = itemView.findViewById(R.id.textView_section_location)
+        val term: TextView = itemView.findViewById(R.id.textView_section_term)
+        val faculty: TextView = itemView.findViewById(R.id.textView_section_faculty)
+        val available: TextView = itemView.findViewById(R.id.textView_section_available)
+        val credits: TextView = itemView.findViewById(R.id.textView_section_credits)
+        val academicLevel: TextView = itemView.findViewById(R.id.textView_section_academicLevel)
+        val meetings: TextView = itemView.findViewById(R.id.textView_section_meetings)
 
         //Set the listener function for the section being clicked to the listener function in this class
         init {
@@ -69,13 +70,13 @@ class SearchResultsAdapter(private var results: List<SearchResult>, private val 
 
         //If the current section is closed (has no available spots), set the background colour of the card to red.
         if (currentResult.status == "Closed") {
-            holder.itemView.relativeLayout_sectionContainer.setBackgroundColor(ContextCompat.getColor(holder.itemView.relativeLayout_sectionContainer.context, R.color.colorEmptySection))
-            holder.itemView.view_verticalDivider.setBackgroundColor(holder.itemView.textView_section_academicLevelLabel.textColors.defaultColor)
-            holder.itemView.view_verticalDivider2.setBackgroundColor(holder.itemView.textView_section_academicLevelLabel.textColors.defaultColor)
+            holder.itemView.findViewById<RelativeLayout>(R.id.relativeLayout_sectionContainer).setBackgroundColor(ContextCompat.getColor(holder.itemView.findViewById<RelativeLayout>(R.id.relativeLayout_sectionContainer).context, R.color.colorEmptySection))
+            holder.itemView.findViewById<View>(R.id.view_verticalDivider).setBackgroundColor(holder.itemView.findViewById<TextView>(R.id.textView_section_academicLevelLabel).textColors.defaultColor)
+            holder.itemView.findViewById<View>(R.id.view_verticalDivider2).setBackgroundColor(holder.itemView.findViewById<TextView>(R.id.textView_section_academicLevelLabel).textColors.defaultColor)
         } else {
-            holder.itemView.relativeLayout_sectionContainer.setBackgroundColor(ContextCompat.getColor(holder.itemView.relativeLayout_sectionContainer.context, R.color.design_default_color_background))
-            holder.itemView.view_verticalDivider.setBackgroundColor(ContextCompat.getColor(holder.itemView.view_verticalDivider.context, R.color.colorShaded))
-            holder.itemView.view_verticalDivider2.setBackgroundColor(ContextCompat.getColor(holder.itemView.view_verticalDivider2.context, R.color.colorShaded))
+            holder.itemView.findViewById<RelativeLayout>(R.id.relativeLayout_sectionContainer).setBackgroundColor(ContextCompat.getColor(holder.itemView.findViewById<RelativeLayout>(R.id.relativeLayout_sectionContainer).context, R.color.design_default_color_background))
+            holder.itemView.findViewById<View>(R.id.view_verticalDivider).setBackgroundColor(ContextCompat.getColor(holder.itemView.findViewById<View>(R.id.view_verticalDivider).context, R.color.colorShaded))
+            holder.itemView.findViewById<View>(R.id.view_verticalDivider2).setBackgroundColor(ContextCompat.getColor(holder.itemView.findViewById<View>(R.id.view_verticalDivider2).context, R.color.colorShaded))
         }
     }
 

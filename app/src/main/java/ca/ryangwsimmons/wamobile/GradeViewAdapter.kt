@@ -5,16 +5,15 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.TextView
 import androidx.recyclerview.widget.RecyclerView
-import kotlinx.android.synthetic.main.recycleritem_grade.view.*
 
 class GradeViewAdapter(private var grades: List<Grade>): RecyclerView.Adapter<GradeViewAdapter.GradeViewHolder>() {
 
     //Create a view holder to hold the data for each grade
     inner class GradeViewHolder(itemView: View): RecyclerView.ViewHolder(itemView) {
-        val courseSection: TextView = itemView.textView_grades_courseSection
-        val courseTitle: TextView = itemView.textView_grades_courseTitle
-        val finalGrade: TextView = itemView.textView_grades_finalGrade
-        val credits: TextView = itemView.textView_grades_Credits
+        val courseSection: TextView = itemView.findViewById(R.id.textView_grades_courseSection)
+        val courseTitle: TextView = itemView.findViewById(R.id.textView_grades_courseTitle)
+        val finalGrade: TextView = itemView.findViewById(R.id.textView_grades_finalGrade)
+        val credits: TextView = itemView.findViewById(R.id.textView_grades_Credits)
     }
 
     //Write the function that creates ViewHolders to put grades in
