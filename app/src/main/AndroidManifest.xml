@@ -1,6 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="ca.ryangwsimmons.wamobile">
+    package="ca.ryangwsimmons.wamobile"
+    android:versionCode="2"
+    android:versionName="0.2">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -19,7 +21,8 @@
             android:name="ca.ryangwsimmons.wamobile.GradeViewActivity"
             android:label="@string/title_activity_grade_view" />
         <activity android:name="ca.ryangwsimmons.wamobile.BaseActivity" />
-        <activity android:name="ca.ryangwsimmons.wamobile.MainActivity">
+        <activity android:name="ca.ryangwsimmons.wamobile.MainActivity"
+            android:exported="false">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
