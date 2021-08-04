@@ -19,6 +19,7 @@
     <string name="menuItem_grades">Grades</string>
     <string name="menuItem_financialProfile">Financial Profile</string>
     <string name="menuItem_accountView">Account View</string>
+    <string name="menuItem_about">About</string>
 
     <string name="network_error">A network error has occurred. Please check your internet connection and try again.</string>
     <string name="signedIn_message">Signed into WebAdvisor as&#160;</string>
@@ -91,6 +92,14 @@
     <string name="accountView_title">Account View</string>
     <string name="accountView_balance">Balance:</string>
     <string name="accountView_noTermsError">Unable to retrieve account view terms.</string>
+
+    <string name="about_header">WAMobile</string>
+    <string name="about_version_base">Version</string>
+    <string name="about_author">By Ryan Simmons</string>
+    <string name="about_website">Website</string>
+    <string name="about_websiteUrl">https://ryangwsimmons.ca/projects/wamobile/</string>
+    <string name="about_githubUrl">https://github.com/ryangwsimmons/WAMobile/</string>
+    <string name="about_source">View This App\'s Source Code on GitHub</string>
 
     <string name="title_activity_grade_view">GradeViewActivity</string>
     <string name="hello_blank_fragment">Hello blank fragment</string>
