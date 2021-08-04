@@ -22,7 +22,7 @@
             android:label="@string/title_activity_grade_view" />
         <activity android:name="ca.ryangwsimmons.wamobile.BaseActivity" />
         <activity android:name="ca.ryangwsimmons.wamobile.MainActivity"
-            android:exported="false">
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
 
