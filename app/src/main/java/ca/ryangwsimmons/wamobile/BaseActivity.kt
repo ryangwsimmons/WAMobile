@@ -3,7 +3,6 @@
 package ca.ryangwsimmons.wamobile
 
 import android.app.AlertDialog
-import android.os.Build
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
@@ -23,8 +22,8 @@ import androidx.appcompat.widget.Toolbar
 import androidx.core.view.GravityCompat
 import androidx.drawerlayout.widget.DrawerLayout
 import androidx.fragment.app.FragmentManager
-import com.google.android.material.navigation.NavigationView
 import ca.ryangwsimmons.wamobile.databinding.ActivityBaseBinding
+import com.google.android.material.navigation.NavigationView
 import kotlinx.coroutines.CoroutineExceptionHandler
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers.Main
@@ -114,27 +113,19 @@ class BaseActivity : AppCompatActivity() {
                 // Set dialog values
                 // Set version number
                 val pInfo = this.packageManager.getPackageInfo(this.packageName, 0)
-                dialogView.findViewById<TextView>(R.id.about_versionString).text = "${resources.getString(R.string.about_version_base)} ${pInfo.versionName}"
+                dialogView.findViewById<TextView>(R.id.about_versionString).text = resources.getString(R.string.about_version, pInfo.versionName)
 
                 // Set website link
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    dialogView.findViewById<TextView>(R.id.textView_website).text =
-                        Html.fromHtml("<a href=\"${resources.getString(R.string.about_websiteUrl)}\">${resources.getString(R.string.about_website)}</a>", Html.FROM_HTML_MODE_COMPACT)
-                } else {
-                    dialogView.findViewById<TextView>(R.id.textView_website).text =
-                        Html.fromHtml("<a href=\"${resources.getString(R.string.about_websiteUrl)}\">${resources.getString(R.string.about_website)}</a>")
-                }
-                dialogView.findViewById<TextView>(R.id.textView_website).movementMethod = LinkMovementMethod.getInstance()
+                val websiteTextView = dialogView.findViewById<TextView>(R.id.textView_website)
+                websiteTextView.text =
+                    Html.fromHtml("<a href=\"${resources.getString(R.string.about_websiteUrl)}\">${resources.getString(R.string.about_website)}</a>", Html.FROM_HTML_MODE_COMPACT)
+                websiteTextView.movementMethod = LinkMovementMethod.getInstance()
 
                 // Set source code link
-                if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                    dialogView.findViewById<TextView>(R.id.textView_source).text =
-                        Html.fromHtml("<a href=\"${resources.getString(R.string.about_githubUrl)}\">${resources.getString(R.string.about_source)}</a>", Html.FROM_HTML_MODE_COMPACT)
-                } else {
-                    dialogView.findViewById<TextView>(R.id.textView_source).text =
-                        Html.fromHtml("<a href=\"${resources.getString(R.string.about_githubUrl)}\">${resources.getString(R.string.about_source)}</a>")
-                }
-                dialogView.findViewById<TextView>(R.id.textView_source).movementMethod = LinkMovementMethod.getInstance()
+                val sourceTextView = dialogView.findViewById<TextView>(R.id.textView_source)
+                sourceTextView.text =
+                    Html.fromHtml("<a href=\"${resources.getString(R.string.about_githubUrl)}\">${resources.getString(R.string.about_source)}</a>", Html.FROM_HTML_MODE_COMPACT)
+                sourceTextView.movementMethod = LinkMovementMethod.getInstance()
 
                 // Open the dialog
                 builder.setView(dialogView)

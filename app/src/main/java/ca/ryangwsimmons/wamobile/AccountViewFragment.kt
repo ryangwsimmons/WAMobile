@@ -25,10 +25,7 @@ class AccountViewFragment(private var session: WASession, private var actionBar:
     private lateinit var currentTerm: AccountViewTerm
 
     // A list of all the terms available in the account view spinner
-    private val allTerms: ArrayList<AccountViewTerm> = ArrayList<AccountViewTerm>()
-
-    // The items in the fragment, allows content to be updated later if necessary
-    private lateinit var viewModel: View
+    private val allTerms: ArrayList<AccountViewTerm> = ArrayList()
 
     private var _binding: FragmentAccountViewBinding? = null
     private val binding get() = _binding!!

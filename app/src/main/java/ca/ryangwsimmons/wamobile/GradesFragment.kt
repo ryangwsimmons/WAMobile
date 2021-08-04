@@ -29,7 +29,7 @@ class GradesFragment(private var session: WASession, private var actionBar: Acti
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentGradesBinding.inflate(inflater, container, false)
         val viewModel = this.binding.root
 
@@ -40,7 +40,7 @@ class GradesFragment(private var session: WASession, private var actionBar: Acti
         val recyclerViewTerms: RecyclerView = this.binding.recyclerViewTerms
 
         //Set the adapter, layout manager, and other settings for the recycler view for the terms
-        val adapter: TermsAdapter = TermsAdapter(ArrayList(), this, requireActivity().applicationContext)
+        val adapter = TermsAdapter(ArrayList(), this, requireActivity().applicationContext)
         recyclerViewTerms.adapter = adapter
         recyclerViewTerms.layoutManager = LinearLayoutManager(requireActivity().applicationContext)
 
@@ -79,7 +79,7 @@ class GradesFragment(private var session: WASession, private var actionBar: Acti
         //Create an intent to change activity
         val intent = Intent(requireActivity().applicationContext, GradeViewActivity::class.java).apply {
             //Set up the parcel for passing data to the activity
-            val bundle: Bundle = Bundle()
+            val bundle = Bundle()
             bundle.putParcelable("session", this@GradesFragment.session)
             bundle.putParcelableArrayList("terms", this@GradesFragment.terms)
             bundle.putInt("position", position)

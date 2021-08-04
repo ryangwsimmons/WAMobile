@@ -8,7 +8,6 @@ import android.widget.RelativeLayout
 import android.widget.TextView
 import androidx.core.content.ContextCompat
 import androidx.recyclerview.widget.RecyclerView
-import org.w3c.dom.Text
 
 class SearchResultsAdapter(private var results: List<SearchResult>, private val listener: OnSectionClickListener): RecyclerView.Adapter<SearchResultsAdapter.SectionHolder>() {
 
@@ -31,7 +30,7 @@ class SearchResultsAdapter(private var results: List<SearchResult>, private val 
 
         //On a section being clicked, trigger the click event in the listener
         override fun onClick(v: View?) {
-            val position = adapterPosition
+            val position = bindingAdapterPosition
             if (position != RecyclerView.NO_POSITION) {
                 listener.onSectionClick(position)
             }

@@ -27,7 +27,7 @@ class NewsFragment(private var session: WASession, private var actionBar: Action
         inflater: LayoutInflater,
         container: ViewGroup?,
         savedInstanceState: Bundle?
-    ): View? {
+    ): View {
         _binding = FragmentNewsBinding.inflate(inflater, container, false)
         val viewModel = binding.root
 
@@ -70,9 +70,9 @@ class NewsFragment(private var session: WASession, private var actionBar: Action
 
                     @TargetApi(Build.VERSION_CODES.N)
                     override fun shouldOverrideUrlLoading(view: WebView?, request: WebResourceRequest?): Boolean {
-                        val url = request?.url?.toString() ?: null
+                        val url = request?.url?.toString()
                         return if (url != null && (url.startsWith("http://") || url.startsWith("https://"))) {
-                            view!!.context.startActivity(Intent(Intent.ACTION_VIEW, request!!.url))
+                            view!!.context.startActivity(Intent(Intent.ACTION_VIEW, request.url))
                             true
                         } else {
                             false

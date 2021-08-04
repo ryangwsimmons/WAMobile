@@ -38,7 +38,7 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
 
     private lateinit var cookies: HashMap<String, String>
     private lateinit var reqVerToken: String
-    private var results: ArrayList<SearchResult> = ArrayList<SearchResult>()
+    private var results: ArrayList<SearchResult> = ArrayList()
 
     private var totalPages = -1
     private var currentPage = 1
@@ -129,7 +129,7 @@ class SearchResultsActivity : AppCompatActivity(), SearchResultsAdapter.OnSectio
         }
 
         // Set up listener to fetch new data when the user has scrolled to the bottom
-        this.binding.nestedScrollViewSections.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, scrollX, scrollY, oldScrollX, oldScrollY ->
+        this.binding.nestedScrollViewSections.setOnScrollChangeListener(NestedScrollView.OnScrollChangeListener { v, _, scrollY, _, _ ->
             if (scrollY == v.getChildAt(0).measuredHeight - v.measuredHeight) {
                 fetchNewPage()
             }

@@ -38,7 +38,7 @@ class GradeViewActivity : AppCompatActivity() {
         this.session = bundle.getParcelable("session")!!
 
         //Get the terms from the bundle
-        this.terms = bundle.getParcelableArrayList<Term>("terms")!!
+        this.terms = bundle.getParcelableArrayList("terms")!!
 
         //Get the position of the selected term in the ArrayList
         this.position = bundle.getInt("position")
@@ -55,7 +55,7 @@ class GradeViewActivity : AppCompatActivity() {
         this.actionbar.title = "Grades for " + this.terms[this.position].longName
 
         //Set up the recycler view settings
-        val adapter: GradeViewAdapter = GradeViewAdapter(ArrayList())
+        val adapter = GradeViewAdapter(ArrayList())
         this.binding.recyclerViewGrades.adapter = adapter
         this.binding.recyclerViewGrades.layoutManager = LinearLayoutManager(this)
 

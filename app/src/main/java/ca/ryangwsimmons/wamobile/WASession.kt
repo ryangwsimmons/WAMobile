@@ -3,7 +3,7 @@
 package ca.ryangwsimmons.wamobile
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 import org.jsoup.Connection.Method
 import org.jsoup.Connection.Response
 import org.jsoup.Jsoup
@@ -257,22 +257,6 @@ class WASession(private val username: String, private val password: String, priv
     }
 
     @Throws(Exception::class)
-    private fun getSearchSectionsResponse(): Response {
-        //Check that a connection has been initialized
-        if (this.homeCookies.isEmpty()) {
-            throw Exception("Error: The connection has not yet been initialized.")
-        }
-
-        //Connect to the WebAdvisor search for sections filter page
-
-        //Return the response
-        return Jsoup.connect("https://webadvisor.uoguelph.ca/WebAdvisor/WebAdvisor?TOKENIDX=" + homeCookies["LASTTOKEN"] + "&CONSTITUENCY=WBST&type=P&pid=ST-WESTS12A")
-            .cookies(homeCookies)
-            .followRedirects(true)
-            .execute()
-    }
-
-    @Throws(Exception::class)
     fun getSearchSectionsFilterValues(): String {
         // Make a request to the Catalog Advanced Search options endpoint
         val res = Jsoup.connect("https://colleague-ss.uoguelph.ca/Student/Courses/GetCatalogAdvancedSearchAsync")
@@ -303,8 +287,8 @@ class WASession(private val username: String, private val password: String, priv
         existingReqVerToken: String? = null
     ): SearchResultsData {
         var res: Response
-        var cookies: MutableMap<String, String>
-        var reqVerToken: String
+        val cookies: MutableMap<String, String>
+        val reqVerToken: String
 
         if (existingCookies != null && existingReqVerToken != null) {
             cookies = existingCookies

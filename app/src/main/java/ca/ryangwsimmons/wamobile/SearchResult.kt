@@ -1,7 +1,7 @@
 package ca.ryangwsimmons.wamobile
 
 import android.os.Parcelable
-import kotlinx.android.parcel.Parcelize
+import kotlinx.parcelize.Parcelize
 
 @Parcelize
 data class SearchResult(

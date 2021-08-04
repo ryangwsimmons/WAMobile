@@ -50,6 +50,7 @@ class SectionDetailsActivity : AppCompatActivity() {
 
         val session: WASession = bundle.getParcelable("session")!!
         val result: SearchResult = bundle.getParcelable("result")!!
+        @Suppress("UNCHECKED_CAST")
         val cookies = intent.extras!!.getSerializable("cookies") as HashMap<String, String>
         val reqVerToken = bundle.getString("reqVerToken")!!
 
@@ -80,7 +81,7 @@ class SectionDetailsActivity : AppCompatActivity() {
 
                 if (this@SectionDetailsActivity.sectionDetails.facultyEmail != "") {
                     // Create a SpannableString and ClickableSpan to enable the email to be clicked like a link, and for an action to happen when that click occurs
-                    val emailSpan: SpannableString = SpannableString(this@SectionDetailsActivity.sectionDetails.facultyEmail)
+                    val emailSpan = SpannableString(this@SectionDetailsActivity.sectionDetails.facultyEmail)
                     val emailClick: ClickableSpan = object: ClickableSpan() {
                         override fun onClick(view: View) {
                             // When an email is clicked on, create an intent that opens an email client
@@ -111,7 +112,7 @@ class SectionDetailsActivity : AppCompatActivity() {
 
                 if (this@SectionDetailsActivity.sectionDetails.facultyPhone != "") {
                     // Create a SpannableString and ClickableSpan to enable the phone number to be clicked like a link, and for an action to happen when that click occurs
-                    val phoneSpan: SpannableString = SpannableString(this@SectionDetailsActivity.sectionDetails.facultyPhone)
+                    val phoneSpan = SpannableString(this@SectionDetailsActivity.sectionDetails.facultyPhone)
                     val phoneClick: ClickableSpan = object: ClickableSpan() {
                         override fun onClick(view: View) {
                             // When a phone number is clicked on, create an intent that opens the dialer
@@ -214,7 +215,7 @@ class SectionDetailsActivity : AppCompatActivity() {
 
     private fun getCourseSpecs(unparsedDescriptionString: String): HashMap<String, String> {
         // Define Regex object with pattern for getting the different course specs in the string
-        val regex = Regex("\\[(.+?)\\]")
+        val regex = Regex("\\[(.+?)]")
 
         // Use regex to get the list of matches in the string
         val matches = regex.findAll(unparsedDescriptionString).toList()

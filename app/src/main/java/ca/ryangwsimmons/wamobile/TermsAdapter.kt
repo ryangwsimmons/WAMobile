@@ -11,10 +11,6 @@ class TermsAdapter(private var terms: List<Term>, private val listener: OnTermCl
 
     private var inflater: LayoutInflater = LayoutInflater.from(this.context)
 
-    init {
-        //Create an inflater using the context passed in from the fragment
-    }
-
     //Create a view holder to hold the data for each term
     inner class TermViewHolder(itemView: View): RecyclerView.ViewHolder(itemView), View.OnClickListener {
         val longName: TextView = itemView.findViewById(R.id.textView_term_longName)
@@ -29,7 +25,7 @@ class TermsAdapter(private var terms: List<Term>, private val listener: OnTermCl
 
         //On a term being clicked, trigger the click event in the listener
         override fun onClick(v: View?) {
-            val position = adapterPosition
+            val position = bindingAdapterPosition
             if (position != RecyclerView.NO_POSITION) {
                 listener.onTermClick(position)
             }
@@ -55,8 +51,8 @@ class TermsAdapter(private var terms: List<Term>, private val listener: OnTermCl
 
         holder.longName.text = currentTerm.longName
         holder.shortName.text = currentTerm.shortName
-        holder.startDate.text = holder.startDate.context.getString(R.string.termSelect_startDate) + currentTerm.startDate
-        holder.endDate.text = holder.endDate.context.getString(R.string.termSelect_endDate) + currentTerm.endDate
+        holder.startDate.text = holder.startDate.context.getString(R.string.termSelect_startDate, currentTerm.startDate)
+        holder.endDate.text = holder.endDate.context.getString(R.string.termSelect_endDate, currentTerm.endDate)
     }
 
     //Set the size of the recycler view to the number of terms in the list

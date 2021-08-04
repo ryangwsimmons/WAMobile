@@ -26,8 +26,8 @@
     <string name="exit_message">Press back again to exit</string>
 
     <string name="termSelect_message">Select Term</string>
-    <string name="termSelect_startDate">Start Date:&#160;</string>
-    <string name="termSelect_endDate">End Date:&#160;</string>
+    <string name="termSelect_startDate">Start Date: %1$s</string>
+    <string name="termSelect_endDate">End Date: %1$s</string>
 
     <string name="finalGrade_label">Final Grade:&#160;</string>
     <string name="credits_label">Credits:&#160;</string>
@@ -94,7 +94,7 @@
     <string name="accountView_noTermsError">Unable to retrieve account view terms.</string>
 
     <string name="about_header">WAMobile</string>
-    <string name="about_version_base">Version</string>
+    <string name="about_version">Version %1$s</string>
     <string name="about_author">By Ryan Simmons</string>
     <string name="about_website">Website</string>
     <string name="about_websiteUrl">https://ryangwsimmons.ca/projects/wamobile/</string>

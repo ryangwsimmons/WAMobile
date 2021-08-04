@@ -35,7 +35,7 @@ class MainActivity : AppCompatActivity() {
         }
 
         //Set the action for when the "Login" button is tapped
-        this.binding.buttonLogin.setOnClickListener(fun (v: View) {
+        this.binding.buttonLogin.setOnClickListener(fun (_: View) {
 
             //Get the username and password the user entered
             val username: String = this.binding.editTextUsername.text.toString()
@@ -48,7 +48,7 @@ class MainActivity : AppCompatActivity() {
             }
 
             //Create a new WebAdvisor session
-            val session: WASession = WASession(username, password, HashMap())
+            val session = WASession(username, password, HashMap())
 
             //Handle any errors that occur in the coroutine
             val errorHandler = CoroutineExceptionHandler { _, error ->
@@ -69,7 +69,7 @@ class MainActivity : AppCompatActivity() {
                     //Create an intent to change activity
                     val intent = Intent(this@MainActivity, BaseActivity::class.java).apply {
                         //Set up the parcel for passing data to the activity
-                        val bundle: Bundle = Bundle()
+                        val bundle = Bundle()
                         bundle.putParcelable("session", session)
                         putExtra("bundle", bundle)
                     }
@@ -84,7 +84,7 @@ class MainActivity : AppCompatActivity() {
 
     private fun showInitialDialog() {
         //Show the dialog
-        var dialog: AlertDialog = AlertDialog.Builder(this)
+        val dialog: AlertDialog = AlertDialog.Builder(this)
             .setTitle(getString(R.string.init_warning_title))
             .setMessage(Html.fromHtml(getString(R.string.init_warning_body), Html.TO_HTML_PARAGRAPH_LINES_INDIVIDUAL))
             .setPositiveButton("OK") { dialog, _ -> dialog.dismiss() }
@@ -95,8 +95,8 @@ class MainActivity : AppCompatActivity() {
         dialog.findViewById<TextView>(android.R.id.message)!!.movementMethod = LinkMovementMethod.getInstance()
 
         //Update the shared preferences so that the dialog doesn't appear again
-        var prefs: SharedPreferences = getSharedPreferences("prefs", MODE_PRIVATE)
-        var editor: SharedPreferences.Editor = prefs.edit()
+        val prefs: SharedPreferences = getSharedPreferences("prefs", MODE_PRIVATE)
+        val editor: SharedPreferences.Editor = prefs.edit()
         editor.putBoolean("firstStart", false)
         editor.apply()
     }
