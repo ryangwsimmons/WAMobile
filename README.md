@@ -4,10 +4,13 @@ An Android app to access the University of Guelph's WebAdvisor service.
 ## Screenshots
 
 <p float="left">
-  <img src="screenshots/login.png?raw=true" width="200" />
-  <img src="screenshots/news.png?raw=true" width="200" />
-  <img src="screenshots/search-for-sections.png?raw=true" width="200" />
-  <img src="screenshots/grades.png?raw=true" width="200" />
+  <img src="screenshots/login.jpg?raw=true" width="200" />
+  <img src="screenshots/news.jpg?raw=true" width="200" />
+  <img src="screenshots/search-for-sections.jpg?raw=true" width="200" />
+  <img src="screenshots/search-results.jpg?raw=true" width="200" />
+  <img src="screenshots/section-details.jpg?raw=true" width="200" />
+  <img src="screenshots/grades.jpg?raw=true" width="200" />
+  <img src="screenshots/account-view.jpg?raw=true" width="200" />
 </p>
 
 ## Installation
@@ -19,7 +22,7 @@ An Android app to access the University of Guelph's WebAdvisor service.
 
 
 ## To-Do
-- Make more WebAdvisor features available in the app (schedules, financial account, etc.)
+- Make more WebAdvisor features available in the app (schedules, etc.)
 - Handle WebAdvisor login time-outs
 - Add app to the Play Store
 
